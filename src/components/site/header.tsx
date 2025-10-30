@@ -55,7 +55,7 @@ export default function SiteHeader() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-           <Button variant="outline" onClick={onOpen} className="rounded-full">
+           <Button variant="ghost" onClick={onOpen} className="rounded-full">
             Falar no WhatsApp
           </Button>
           <Button onClick={onOpen} className="rounded-full">
