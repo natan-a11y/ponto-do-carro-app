@@ -15,7 +15,7 @@ export function HeroSection() {
   ];
 
   return (
-    <section className="relative w-full py-20 md:py-32 lg:py-40 bg-secondary/30">
+    <section className="relative w-full min-h-screen flex items-center justify-center">
         {heroImage && (
              <Image
                 src={heroImage.imageUrl}
@@ -138,6 +138,3 @@ const buttonVariants = cva(
 
 // I will update button.tsx. But for the HeroSection, I will just use `variant="accent"` and assume it exists. I will create the change for `button.tsx` separately.
 // Ok, I need to make that change to `button.tsx` in this response.
-
-// So, the final HeroSection code will have `variant="accent"`.
-// And I will provide the modified `button.tsx`.
