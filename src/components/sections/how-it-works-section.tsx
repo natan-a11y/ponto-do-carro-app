@@ -8,7 +8,7 @@ export function HowItWorksSection() {
       <div className="container max-w-4xl mx-auto px-4 flex flex-col items-center gap-12">
         
         <div className="w-full flex justify-center items-center animate-in fade-in slide-in-from-left-8 duration-1000 ease-in-out">
-          <div className="w-full max-w-2xl">
+          <div className="w-full max-w-xl">
              <Image
               src="https://i.postimg.cc/bJFNLCc0/2020-Honda-Civic-Type-R-011-2160.jpg"
               alt="Carro esportivo moderno em exibição"
