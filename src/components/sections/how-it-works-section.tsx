@@ -12,6 +12,7 @@ export function HowItWorksSection() {
               alt="Carro esportivo moderno em exibição"
               width={600}
               height={400}
+              quality={100}
               className="rounded-r-[3rem] object-cover aspect-video w-full h-full"
               />
           </div>
