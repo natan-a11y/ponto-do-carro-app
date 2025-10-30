@@ -59,7 +59,7 @@ export default function SiteFooter() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-border/40 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Carro Venda Rápida. Todos os direitos reservados.
+          © {new Date().getFullYear()} Ponto do Carro. Todos os direitos reservados.
         </div>
       </div>
     </footer>

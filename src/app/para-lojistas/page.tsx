@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import { B2BForm } from "@/components/forms/b2b-form";
 
 export const metadata: Metadata = {
-  title: 'Para Lojistas | Carro Venda Rápida',
+  title: 'Para Lojistas | Ponto do Carro',
   description: 'Seja nosso parceiro e tenha acesso a um deal flow qualificado de veículos. Aumente seu estoque sem esforço e com zero Capex.',
 };
 
@@ -22,7 +22,7 @@ export default function ParaLojistasPage() {
                     Mais estoque, menos esforço.
                 </h1>
                 <p className="mt-4 text-lg text-muted-foreground">
-                    Seja um lojista parceiro e tenha acesso a oportunidades qualificadas, sem investimento inicial. A Carro Venda Rápida é sua ponte para um estoque renovado e de qualidade.
+                    Seja um lojista parceiro e tenha acesso a oportunidades qualificadas, sem investimento inicial. A Ponto do Carro é sua ponte para um estoque renovado e de qualidade.
                 </p>
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {B2B_BENEFITS.map((benefit) => (

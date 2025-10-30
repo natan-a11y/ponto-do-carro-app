@@ -4,8 +4,8 @@ import type { Metadata } from 'next';
 import { BadgeCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: 'Sobre Nós | Carro Venda Rápida',
-  description: 'Conheça a história e a missão da Carro Venda Rápida: revolucionar a venda de carros usados em Belo Horizonte com tecnologia, transparência e eficiência.',
+  title: 'Sobre Nós | Ponto do Carro',
+  description: 'Conheça a história e a missão da Ponto do Carro: revolucionar a venda de carros usados em Belo Horizonte com tecnologia, transparência e eficiência.',
 };
 
 const aboutImage = placeholderImages.find(p => p.id === 'about-us');
@@ -48,7 +48,7 @@ export default function SobreNosPage() {
                 <div className="relative aspect-4/3 w-full rounded-lg overflow-hidden shadow-lg order-1 lg:order-2">
                     <Image
                         src={aboutImage.imageUrl}
-                        alt="Equipe Carro Venda Rápida"
+                        alt="Equipe Ponto do Carro"
                         fill
                         className="object-cover"
                         data-ai-hint={aboutImage.imageHint}

@@ -4,7 +4,7 @@ import { FAQS } from '@/lib/data';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Perguntas Frequentes (FAQ) | Carro Venda Rápida',
+  title: 'Perguntas Frequentes (FAQ) | Ponto do Carro',
   description: 'Tire todas as suas dúvidas sobre como vender seu carro. Informações sobre avaliação, pagamento, documentos e mais.',
 };
 

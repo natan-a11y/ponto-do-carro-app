@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { B2BForm } from '@/components/forms/b2b-form';
 
 export const metadata: Metadata = {
-  title: 'Contato | Carro Venda Rápida',
+  title: 'Contato | Ponto do Carro',
   description: 'Fale conosco. Entre em contato com uma de nossas unidades ou, se for um lojista, conheça nosso programa de parceria.',
 };
 
