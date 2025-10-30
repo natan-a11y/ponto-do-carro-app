@@ -5,6 +5,7 @@ import SiteFooter from '@/components/site/footer';
 import StickyCTA from '@/components/site/sticky-cta';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: 'Venda seu Carro em BH em até 24h | Ponto do Carro',
@@ -21,7 +22,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Inter:wght@400;700&display=swap" rel="stylesheet" />
         <link rel="preconnect" href="https://wa.me" />
         <link rel="preconnect" href="https://maps.googleapis.com" />
       </head>
@@ -37,6 +38,7 @@ export default function RootLayout({
         </div>
         <StickyCTA />
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
