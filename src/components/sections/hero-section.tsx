@@ -28,7 +28,7 @@ export function HeroSection() {
         )}
         <div className="absolute inset-0 bg-primary/5 z-10" />
 
-      <div className="container relative z-20 mx-auto px-4 text-center text-primary-foreground">
+      <div className="container relative z-20 mx-auto px-4 text-center text-primary-foreground pt-32">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline">
           Venda seu carro em até 24h
         </h1>
