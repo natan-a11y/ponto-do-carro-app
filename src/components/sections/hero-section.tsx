@@ -32,8 +32,8 @@ export function HeroSection() {
           <div className="mt-8 flex flex-col items-end gap-4 text-base text-primary-foreground">
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-accent" />
                 <span>{benefit}</span>
+                <CheckCircle className="h-5 w-5 text-accent" />
               </div>
             ))}
           </div>
