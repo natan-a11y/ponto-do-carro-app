@@ -3,7 +3,6 @@
 import { REVIEWS } from "@/lib/data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import Image from "next/image";
 import { Star } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 import React from "react";
@@ -47,14 +46,6 @@ export function SocialProofSection() {
                         <p className="text-muted-foreground mb-6 text-base">"{review.text}"</p>
                       </CardContent>
                       <div className="flex items-center gap-4">
-                        <Image
-                          src={review.avatarUrl}
-                          alt={review.author}
-                          width={48}
-                          height={48}
-                          className="rounded-full object-cover"
-                          data-ai-hint={review.avatarHint}
-                        />
                         <div>
                           <p className="font-bold text-foreground">{review.author}</p>
                           <p className="text-sm text-muted-foreground">Cliente Verificado</p>
