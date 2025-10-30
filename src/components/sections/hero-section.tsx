@@ -26,7 +26,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-l from-black/80 via-black/60 to-transparent z-10" />
 
       <div className="container relative z-20 h-full flex flex-col justify-center items-end text-right max-w-7xl">
-        <div className="max-w-2xl mt-48">
+        <div className="max-w-2xl">
            <h1 className={cn(
             "text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline text-primary-foreground"
           )}>
