@@ -31,7 +31,7 @@ export default function RootLayout({
           "min-h-screen bg-background font-body antialiased",
         )}
       >
-        <div className="relative flex min-h-dvh flex-col bg-background">
+        <div className="relative flex min-h-dvh flex-col">
           <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />
