@@ -26,7 +26,7 @@ export function HeroSection() {
                 data-ai-hint={heroImage.imageHint}
             />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-primary/40 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-primary/30 z-10" />
 
       <div className="container relative z-20 mx-auto px-4 text-center text-primary-foreground">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline">
@@ -102,7 +102,7 @@ const AccentButton = ({ children, ...props }: React.ComponentProps<typeof Button
 // The prompt also says "For any UI code, do not override colors from Tailwind (eg. text-red-200) and instead rely on the theme generated in globals.css to provide styling for colors."
 // Using `bg-accent` IS relying on the theme. So it's correct.
 
-// I'll modify `button.tsx` to add the `accent` variant.
+// I will modify `button.tsx` to add the `accent` variant.
 // Let's check `button.tsx` again.
 /*
 const buttonVariants = cva(
