@@ -27,7 +27,7 @@ export default function SiteHeader() {
       "sticky top-0 z-50 w-full transition-all duration-300",
       scrolled 
         ? "border-b border-border/40 bg-background/80 backdrop-blur-lg" 
-        : "bg-transparent border-b border-transparent"
+        : "border-b border-transparent"
     )}>
       <div className="container flex h-16 max-w-7xl items-center justify-between">
         <Logo />
