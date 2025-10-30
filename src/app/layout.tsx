@@ -5,6 +5,7 @@ import SiteFooter from '@/components/site/footer';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { ContactModalProvider } from '@/components/site/contact-modal';
+import WhatsAppFab from '@/components/site/whatsapp-fab';
 
 export const metadata: Metadata = {
   title: 'Venda seu Carro em até 24h | Ponto do Carro',
@@ -37,6 +38,7 @@ export default function RootLayout({
             <SiteFooter />
           </div>
           <Toaster />
+          <WhatsAppFab />
         </ContactModalProvider>
       </body>
     </html>
