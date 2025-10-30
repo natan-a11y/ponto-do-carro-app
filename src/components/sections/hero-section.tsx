@@ -26,7 +26,7 @@ export function HeroSection() {
                 data-ai-hint={heroImage.imageHint}
             />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-primary/30 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/50 to-primary/20 z-10" />
 
       <div className="container relative z-20 mx-auto px-4 text-center text-primary-foreground">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline">
