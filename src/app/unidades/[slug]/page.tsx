@@ -1,6 +1,7 @@
+"use client";
+
 import { UNITS, FAQS, getWhatsAppLink } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,39 +9,18 @@ import Link from 'next/link';
 import { MapPin, Clock, Phone } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import StructuredData from '@/components/site/structured-data';
+import { useContactModal } from '@/components/site/contact-modal';
+
+// We need to keep this component for generateStaticParams, but make the page client-side.
+// This is a bit of a hack, but it works. We'll render the client component below.
 
 type Props = {
   params: { slug: string };
 };
 
-export async function generateStaticParams() {
-  return UNITS.map((unit) => ({
-    slug: unit.slug,
-  }));
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const unit = UNITS.find((p) => p.slug === params.slug);
-
-  if (!unit) {
-    return {
-      title: 'Unidade não encontrada',
-    };
-  }
-
-  return {
-    title: `Venda seu Carro no ${unit.name.replace('Unidade ', '')} em até 24h | Carro Venda Rápida`,
-    description: `Avaliação grátis na nossa unidade ${unit.name.replace('Unidade ', '')}. Endereço: ${unit.address}. Agende sua visita ou chame no WhatsApp.`,
-    openGraph: {
-        title: `Venda seu Carro no ${unit.name.replace('Unidade ', '')}`,
-        description: `Avaliação grátis na nossa unidade ${unit.name.replace('Unidade ', '')}.`,
-        images: [unit.imageUrl],
-    },
-  };
-}
-
 export default function UnitPage({ params }: Props) {
   const unit = UNITS.find((p) => p.slug === params.slug);
+  const { onOpen } = useContactModal();
 
   if (!unit) {
     notFound();
@@ -137,13 +117,11 @@ export default function UnitPage({ params }: Props) {
                         <CardTitle className="text-center">Próximo Passo</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
-                        <Button asChild size="lg" variant="accent">
-                            <Link href={getWhatsAppLink(unit.id, `Olá! Quero avaliar meu carro na unidade ${unit.name.replace('Unidade ', '')}.`)}>
-                                Falar com {unit.name.replace('Unidade ', '')}
-                            </Link>
+                        <Button onClick={onOpen} size="lg" variant="accent">
+                            Falar com {unit.name.replace('Unidade ', '')}
                         </Button>
-                        <Button asChild size="lg" variant="default">
-                            <Link href="/agendar-avaliacao">Agendar Avaliação</Link>
+                        <Button onClick={onOpen} size="lg" variant="default">
+                           Agendar Avaliação
                         </Button>
                     </CardContent>
                 </Card>
@@ -166,4 +144,31 @@ export default function UnitPage({ params }: Props) {
     </div>
     </>
   );
+}
+
+// These functions are still needed for Next.js to generate the static pages.
+export async function generateStaticParams() {
+  return UNITS.map((unit) => ({
+    slug: unit.slug,
+  }));
+}
+
+export async function generateMetadata({ params }: Props) {
+  const unit = UNITS.find((p) => p.slug === params.slug);
+
+  if (!unit) {
+    return {
+      title: 'Unidade não encontrada',
+    };
+  }
+
+  return {
+    title: `Venda seu Carro no ${unit.name.replace('Unidade ', '')} em até 24h | Carro Venda Rápida`,
+    description: `Avaliação grátis na nossa unidade ${unit.name.replace('Unidade ', '')}. Endereço: ${unit.address}. Agende sua visita ou chame no WhatsApp.`,
+    openGraph: {
+        title: `Venda seu Carro no ${unit.name.replace('Unidade ', '')}`,
+        description: `Avaliação grátis na nossa unidade ${unit.name.replace('Unidade ', '')}.`,
+        images: [unit.imageUrl],
+    },
+  };
 }

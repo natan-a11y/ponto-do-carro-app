@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import SiteHeader from '@/components/site/header';
 import SiteFooter from '@/components/site/footer';
-import WhatsAppFab from '@/components/site/whatsapp-fab';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import { ContactModalProvider } from '@/components/site/contact-modal';
 
 export const metadata: Metadata = {
   title: 'Venda seu Carro em até 24h | Ponto do Carro',
@@ -30,13 +30,14 @@ export default function RootLayout({
           "min-h-screen font-body antialiased",
         )}
       >
-        <div className="relative flex min-h-dvh flex-col bg-background">
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </div>
-        <WhatsAppFab />
-        <Toaster />
+        <ContactModalProvider>
+          <div className="relative flex min-h-dvh flex-col bg-background">
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </div>
+          <Toaster />
+        </ContactModalProvider>
       </body>
     </html>
   );

@@ -1,15 +1,19 @@
-import { AppointmentForm } from "@/components/forms/appointment-form";
-import { UNITS, getWhatsAppLink } from "@/lib/data";
-import type { Metadata } from "next";
-import Link from "next/link";
-import { AppointmentFormProvider } from "@/components/forms/appointment-form-context";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Agendar Avaliação | Carro Venda Rápida",
-  description: "Agende sua avaliação gratuita em 3 passos simples. Preencha os dados do seu veículo e escolha o melhor dia e horário.",
-};
+import { AppointmentForm } from "@/components/forms/appointment-form";
+import { UNITS } from "@/lib/data";
+import { AppointmentFormProvider } from "@/components/forms/appointment-form-context";
+import { useContactModal } from "@/components/site/contact-modal";
+import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
 
 export default function AgendarAvaliacaoPage() {
+  const { onOpen } = useContactModal();
+
+  // Since we are using 'use client', we can't export metadata directly.
+  // This should be handled in a parent layout or via the file-based metadata API if possible.
+  // For this case, we will just have the title in the h1.
+
   return (
     <div className="w-full py-16 md:py-24 bg-background">
       <div className="container max-w-4xl mx-auto px-4">
@@ -19,7 +23,10 @@ export default function AgendarAvaliacaoPage() {
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             Complete os 3 passos para agendar sua vistoria de 15 minutos.
-            Prefere falar com alguém? <Link href={getWhatsAppLink()} className="text-primary underline hover:text-primary/80">Chame no WhatsApp</Link>.
+            Prefere falar com alguém?{' '}
+             <Button variant="link" className="p-0 h-auto text-lg text-primary underline hover:text-primary/80" onClick={onOpen}>
+              Chame no WhatsApp
+            </Button>.
           </p>
         </div>
         

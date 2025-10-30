@@ -5,23 +5,31 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import { NAV_ITEMS, getWhatsAppLink } from "@/lib/data";
+import { NAV_ITEMS } from "@/lib/data";
 import { Logo } from "./logo";
 import { usePathname } from 'next/navigation';
 import { cn } from "@/lib/utils";
+import { useContactModal } from "./contact-modal";
 
 export default function SiteHeader() {
+  const { onOpen } = useContactModal();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Set initial state
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  
+  const handleMenuClick = () => {
+    onOpen();
+    setMobileMenuOpen(false);
+  };
 
   return (
     <header className={cn(
@@ -47,14 +55,14 @@ export default function SiteHeader() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-           <Button variant="outline" asChild className="rounded-full">
-            <Link href={getWhatsAppLink(undefined, 'Olá! Gostaria de agendar uma avaliação.')}>Falar no WhatsApp</Link>
+           <Button variant="outline" onClick={onOpen} className="rounded-full">
+            Falar no WhatsApp
           </Button>
-          <Button asChild className="rounded-full">
-            <Link href="/agendar-avaliacao">Agendar Avaliação</Link>
+          <Button onClick={onOpen} className="rounded-full">
+            Agendar Avaliação
           </Button>
         </div>
-        <Sheet>
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="h-6 w-6" />
@@ -71,6 +79,7 @@ export default function SiteHeader() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={cn(
                       "text-lg font-medium transition-colors hover:text-primary",
                       pathname === item.href ? "text-primary" : "text-foreground/80"
@@ -81,11 +90,11 @@ export default function SiteHeader() {
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-4">
-                <Button variant="outline" asChild className="rounded-full">
-                  <Link href={getWhatsAppLink(undefined, 'Olá! Gostaria de agendar uma avaliação.')}>Falar no WhatsApp</Link>
+                <Button variant="outline" onClick={handleMenuClick} className="rounded-full">
+                  Falar no WhatsApp
                 </Button>
-                <Button asChild className="rounded-full">
-                  <Link href="/agendar-avaliacao">Agendar Avaliação</Link>
+                <Button onClick={handleMenuClick} className="rounded-full">
+                  Agendar Avaliação
                 </Button>
               </div>
             </div>
