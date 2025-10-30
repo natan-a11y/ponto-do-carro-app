@@ -40,9 +40,19 @@ export function HowItWorksSection() {
           </div>
       </div>
       
-      <div className="container max-w-xs mx-auto px-4">
-          <div className="w-full flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out">
-              <div className="relative w-full">
+      <div className="grid md:grid-cols-2 gap-12 w-full items-center">
+          <div className="animate-in fade-in slide-in-from-left-8 duration-1000 ease-in-out pl-4 lg:pl-16 order-2 md:order-1">
+              <div className="text-center md:text-left">
+                  <h3 className="text-2xl font-bold tracking-tight sm:text-3xl font-headline">
+                      Veja na Prática
+                  </h3>
+                  <p className="mt-4 text-lg text-muted-foreground">
+                      Nosso processo foi desenhado para ser o mais rápido e transparente possível. Em menos tempo do que você imagina, seu carro é avaliado, anunciado para centenas de lojistas e vendido pelo melhor preço, sem que você precise sair de casa para negociar. Assista ao lado e veja como transformamos um processo complicado em algo simples e digital.
+                  </p>
+              </div>
+          </div>
+           <div className="w-full flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out order-1 md:order-2">
+              <div className="relative w-full max-w-sm">
                   <div style={{padding:'177.78% 0 0 0',position:'relative'}}>
                       <iframe 
                           src="https://player.vimeo.com/video/1132253360?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=1" 
