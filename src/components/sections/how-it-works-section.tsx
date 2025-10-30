@@ -1,34 +1,45 @@
 import { HOW_IT_WORKS_STEPS } from "@/lib/data";
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function HowItWorksSection() {
   return (
     <section id="how-it-works" className="w-full py-16 md:py-24 bg-background">
       <div className="container max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12 animate-in fade-in slide-in-from-top-8 duration-1000 ease-in-out">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
-            Como Funciona
-          </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-            Vender seu carro nunca foi tão fácil. Siga 3 passos simples.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {HOW_IT_WORKS_STEPS.map((step, index) => (
-            <div key={step.id} className="animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out" style={{animationDelay: `${index * 150}ms`}}>
-              <Card className="text-center border-0 shadow-lg hover:shadow-2xl transition-shadow duration-300 h-full bg-card group">
-                <CardHeader>
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary mb-4 transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
-                    <step.icon className="h-8 w-8" />
-                  </div>
-                  <CardTitle className="font-headline text-2xl">{step.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">{step.description}</CardDescription>
-                </CardContent>
-              </Card>
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="animate-in fade-in slide-in-from-left-8 duration-1000 ease-in-out">
+                <Image
+                    src="https://i.postimg.cc/bJFNLCc0/2020-Honda-Civic-Type-R-011-2160.jpg"
+                    alt="Carro sendo avaliado"
+                    width={1080}
+                    height={720}
+                    className="rounded-lg shadow-2xl"
+                    data-ai-hint="car inspection"
+                />
             </div>
-          ))}
+            <div className="animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out">
+                 <div className="mb-8">
+                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
+                        Como Funciona
+                    </h2>
+                    <p className="mt-4 text-lg text-muted-foreground">
+                        Vender seu carro nunca foi tão fácil. Siga 3 passos simples.
+                    </p>
+                </div>
+                <div className="space-y-6">
+                    {HOW_IT_WORKS_STEPS.map((step) => (
+                        <div key={step.id} className="flex gap-6 items-start">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary flex-shrink-0">
+                                <step.icon className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-headline text-xl font-semibold">{step.title}</h3>
+                                <p className="text-muted-foreground mt-1">{step.description}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
       </div>
     </section>
