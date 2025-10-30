@@ -6,7 +6,7 @@ import { Star } from "lucide-react";
 
 export function SocialProofSection() {
   return (
-    <section id="reviews" className="w-full py-16 md:py-24 bg-secondary/30">
+    <section id="reviews" className="w-full py-16 md:py-24 bg-secondary">
       <div className="container max-w-7xl mx-auto px-4">
         <div className="text-center mb-12 animate-in fade-in slide-in-from-top-8 duration-1000 ease-in-out">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
@@ -22,37 +22,40 @@ export function SocialProofSection() {
               align: "start",
               loop: true,
             }}
-            className="w-full max-w-4xl mx-auto"
+            className="w-full max-w-6xl mx-auto"
           >
             <CarouselContent>
               {REVIEWS.map((review) => (
                 <CarouselItem key={review.id} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="p-1 h-full">
-                    <Card className="flex flex-col h-full justify-between p-6 shadow-md">
+                  <div className="p-2 h-full">
+                    <Card className="flex flex-col h-full justify-between p-6 shadow-md bg-background">
                       <CardContent className="p-0">
-                        <div className="flex text-yellow-500 mb-4">
+                        <div className="flex text-accent mb-4">
                           {[...Array(5)].map((_, i) => <Star key={i} className="h-5 w-5 fill-current" />)}
                         </div>
-                        <p className="text-muted-foreground mb-6">"{review.text}"</p>
+                        <p className="text-muted-foreground mb-6 text-base">"{review.text}"</p>
                       </CardContent>
                       <div className="flex items-center gap-4">
                         <Image
                           src={review.avatarUrl}
                           alt={review.author}
-                          width={40}
-                          height={40}
-                          className="rounded-full"
+                          width={48}
+                          height={48}
+                          className="rounded-full object-cover"
                           data-ai-hint={review.avatarHint}
                         />
-                        <p className="font-bold text-foreground">{review.author}</p>
+                        <div>
+                          <p className="font-bold text-foreground">{review.author}</p>
+                          <p className="text-sm text-muted-foreground">Cliente Verificado</p>
+                        </div>
                       </div>
                     </Card>
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious className="ml-10" />
+            <CarouselNext className="mr-10" />
           </Carousel>
         </div>
       </div>

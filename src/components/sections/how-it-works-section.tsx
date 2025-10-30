@@ -1,5 +1,5 @@
 import { HOW_IT_WORKS_STEPS } from "@/lib/data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function HowItWorksSection() {
   return (
@@ -16,15 +16,15 @@ export function HowItWorksSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {HOW_IT_WORKS_STEPS.map((step, index) => (
             <div key={step.id} className="animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out" style={{animationDelay: `${index * 150}ms`}}>
-              <Card className="text-center border-2 border-transparent hover:border-primary/50 hover:shadow-lg transition-all duration-300 h-full">
+              <Card className="text-center border-0 shadow-lg hover:shadow-2xl transition-shadow duration-300 h-full bg-card group">
                 <CardHeader>
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary mb-4 transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                     <step.icon className="h-8 w-8" />
                   </div>
                   <CardTitle className="font-headline text-2xl">{step.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{step.description}</p>
+                  <CardDescription className="text-base">{step.description}</CardDescription>
                 </CardContent>
               </Card>
             </div>
