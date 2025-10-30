@@ -18,19 +18,11 @@ export function HeroSection() {
   ];
 
   return (
-    <section className="relative w-full h-screen flex items-center justify-center -mt-16">
-        {heroImage && (
-             <Image
-                src={heroImage.imageUrl}
-                alt="Carro moderno em destaque"
-                fill
-                className="object-cover z-0"
-                priority
-                quality={100}
-                data-ai-hint={heroImage.imageHint}
-            />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-l from-primary/20 to-transparent z-10" />
+    <div 
+      className="relative w-full h-screen flex items-center justify-center -mt-16 bg-cover bg-center"
+      style={{ backgroundImage: `url(${heroImage?.imageUrl})` }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-l from-primary/20 to-transparent z-10" />
 
       <div className="container relative z-20 max-w-7xl h-full flex flex-col justify-center items-end">
         <div className="max-w-2xl text-right">
@@ -55,6 +47,6 @@ export function HeroSection() {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
