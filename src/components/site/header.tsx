@@ -47,10 +47,10 @@ export default function SiteHeader() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-           <Button variant="outline" asChild>
+           <Button variant="outline" asChild className="rounded-full">
             <Link href={getWhatsAppLink(undefined, 'Olá! Gostaria de agendar uma avaliação.')}>Falar no WhatsApp</Link>
           </Button>
-          <Button asChild>
+          <Button asChild className="rounded-full">
             <Link href="/agendar-avaliacao">Agendar Avaliação</Link>
           </Button>
         </div>
@@ -81,10 +81,10 @@ export default function SiteHeader() {
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-4">
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild className="rounded-full">
                   <Link href={getWhatsAppLink(undefined, 'Olá! Gostaria de agendar uma avaliação.')}>Falar no WhatsApp</Link>
                 </Button>
-                <Button asChild>
+                <Button asChild className="rounded-full">
                   <Link href="/agendar-avaliacao">Agendar Avaliação</Link>
                 </Button>
               </div>
