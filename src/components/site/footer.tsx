@@ -9,7 +9,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-border/40 mt-16 pt-12 pb-8">
+    <footer className="border-t border-border/40 py-12 bg-background">
       <div className="container max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col gap-4 md:col-span-1">
