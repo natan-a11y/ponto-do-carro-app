@@ -42,12 +42,12 @@ export function HeroSection() {
           ))}
         </div>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-end gap-4">
-          <Button size="lg" variant="accent" asChild>
+          <Button size="lg" variant="accent" asChild className="rounded-full">
             <Link href={getWhatsAppLink()}>
               Falar no WhatsApp
             </Link>
           </Button>
-          <Button size="lg" variant="secondary" asChild>
+          <Button size="lg" variant="secondary" asChild className="rounded-full">
             <Link href="/agendar-avaliacao">
               Agendar avaliação online
             </Link>
