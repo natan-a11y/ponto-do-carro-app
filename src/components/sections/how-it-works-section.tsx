@@ -41,6 +41,20 @@ export function HowItWorksSection() {
                 </div>
             </div>
         </div>
+        <div className="mt-16 md:mt-24 flex justify-center animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out">
+            <div className="relative w-full max-w-xs">
+                <div className="aspect-[9/16] w-full">
+                    <iframe 
+                        className="w-full h-full rounded-2xl shadow-2xl border"
+                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                        title="YouTube video player" 
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowFullScreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
       </div>
     </section>
   );
