@@ -1,10 +1,18 @@
+"use client";
+
 import { REVIEWS } from "@/lib/data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Image from "next/image";
 import { Star } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
+import React from "react";
 
 export function SocialProofSection() {
+  const plugin = React.useRef(
+    Autoplay({ delay: 2000, stopOnInteraction: true })
+  );
+
   return (
     <section id="reviews" className="w-full py-16 md:py-24 bg-secondary">
       <div className="container max-w-7xl mx-auto px-4">
@@ -18,6 +26,9 @@ export function SocialProofSection() {
         </div>
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out">
           <Carousel
+            plugins={[plugin.current]}
+            onMouseEnter={plugin.current.stop}
+            onMouseLeave={plugin.current.reset}
             opts={{
               align: "start",
               loop: true,
@@ -25,8 +36,8 @@ export function SocialProofSection() {
             className="w-full max-w-6xl mx-auto"
           >
             <CarouselContent>
-              {REVIEWS.map((review) => (
-                <CarouselItem key={review.id} className="md:basis-1/2 lg:basis-1/3">
+              {REVIEWS.map((review, index) => (
+                <CarouselItem key={`${review.id}-${index}`} className="md:basis-1/2 lg:basis-1/3">
                   <div className="p-2 h-full">
                     <Card className="flex flex-col h-full justify-between p-6 shadow-md bg-background">
                       <CardContent className="p-0">

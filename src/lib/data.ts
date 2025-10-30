@@ -47,13 +47,16 @@ export const FAQS: FAQItem[] = [
   { id: '5', question: 'Onde ficam as unidades?', answer: `Atualmente, temos unidades nos bairros Buritis e Caiçara, em Belo Horizonte. Você pode agendar uma avaliação na mais próxima de você.`},
 ];
 
-export const REVIEWS: Review[] = [
+const originalReviews: Review[] = [
   { id: '1', author: 'Mariana P.', text: 'Processo super rápido e transparente. Vendi meu carro em menos de 24h e o dinheiro caiu na conta no mesmo dia. Recomendo!', avatarUrl: getPlaceholderImage('review-1').url, avatarHint: getPlaceholderImage('review-1').hint },
   { id: '2', author: 'Carlos F.', text: 'Fui muito bem atendido na unidade Buritis. A avaliação foi realmente rápida e a proposta foi justa. Melhor que vender pra particular.', avatarUrl: getPlaceholderImage('review-2').url, avatarHint: getPlaceholderImage('review-2').hint },
   { id: '3', author: 'Juliana S.', text: 'Tinha receio, mas a experiência foi ótima. Sem burocracia e com segurança. Equipe profissional.', avatarUrl: getPlaceholderImage('review-3').url, avatarHint: getPlaceholderImage('review-3').hint },
   { id: '4', author: 'Rafael L.', text: 'Consegui um valor melhor do que em outras concessionárias. O fato de vários lojistas disputarem o carro faz diferença.', avatarUrl: getPlaceholderImage('review-4').url, avatarHint: getPlaceholderImage('review-4').hint },
   { id: '5', author: 'Beatriz M.', text: 'Praticidade total. Agendei online, fui atendida no horário e resolvi a venda do meu carro sem dor de cabeça.', avatarUrl: getPlaceholderImage('review-5').url, avatarHint: getPlaceholderImage('review-5').hint },
 ];
+
+export const REVIEWS: Review[] = [...originalReviews, ...originalReviews];
+
 
 export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
     { id: '1', title: '1. Agende grátis', description: 'Escolha a unidade mais próxima e agende online ou pelo WhatsApp.', icon: Calendar },
