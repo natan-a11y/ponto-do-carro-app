@@ -6,14 +6,17 @@ export function HowItWorksSection() {
   return (
     <section id="how-it-works" className="w-full py-16 md:py-24 bg-background">
       <div className="container max-w-4xl mx-auto px-4 flex flex-col items-center gap-12">
+        
         <div className="w-full flex justify-center items-center animate-in fade-in slide-in-from-left-8 duration-1000 ease-in-out">
-          <Image
-            src="https://i.postimg.cc/bJFNLCc0/2020-Honda-Civic-Type-R-011-2160.jpg"
-            alt="Carro esportivo moderno em exibição"
-            width={600}
-            height={400}
-            className="rounded-[3rem] object-cover aspect-video"
-          />
+          <div className="w-full max-w-2xl">
+             <Image
+              src="https://i.postimg.cc/bJFNLCc0/2020-Honda-Civic-Type-R-011-2160.jpg"
+              alt="Carro esportivo moderno em exibição"
+              width={600}
+              height={400}
+              className="rounded-[3rem] object-cover aspect-video w-full"
+            />
+          </div>
         </div>
 
         <div className="text-center animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out">
