@@ -5,7 +5,6 @@ import SiteFooter from '@/components/site/footer';
 import StickyCTA from '@/components/site/sticky-cta';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: 'Venda seu Carro em até 24h | Ponto do Carro',
@@ -28,17 +27,16 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-body antialiased",
+          "min-h-screen font-body antialiased",
         )}
       >
+        <SiteHeader />
         <div className="relative flex min-h-dvh flex-col">
-          <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </div>
         <StickyCTA />
         <Toaster />
-        <Analytics />
       </body>
     </html>
   );
