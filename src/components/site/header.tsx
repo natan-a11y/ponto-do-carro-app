@@ -55,7 +55,7 @@ export default function SiteHeader() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-           <Button variant="ghost" onClick={onOpen} className="rounded-full">
+           <Button variant="accent" onClick={onOpen} className="rounded-full">
             Falar no WhatsApp
           </Button>
           <Button onClick={onOpen} className="rounded-full">
@@ -90,7 +90,7 @@ export default function SiteHeader() {
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-4">
-                <Button variant="outline" onClick={handleMenuClick} className="rounded-full">
+                <Button variant="accent" onClick={handleMenuClick} className="rounded-full">
                   Falar no WhatsApp
                 </Button>
                 <Button onClick={handleMenuClick} className="rounded-full">
