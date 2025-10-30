@@ -26,8 +26,8 @@ export default function SiteHeader() {
     <header className={cn(
       "sticky top-0 z-50 w-full transition-all duration-300",
       scrolled 
-        ? "border-b border-border/40 bg-background/80 backdrop-blur-lg" 
-        : "border-b border-transparent"
+        ? "border-b border-border/40 bg-background/80 backdrop-blur-lg opacity-100" 
+        : "border-b border-transparent opacity-0"
     )}>
       <div className="container flex h-16 max-w-7xl items-center justify-between">
         <Logo />
