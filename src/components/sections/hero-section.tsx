@@ -38,10 +38,10 @@ export function HeroSection() {
             ))}
           </div>
           <div className="mt-10 flex flex-col items-end gap-4">
-            <Button size="lg" variant="accent" onClick={onOpen} className="rounded-full">
+            <Button size="lg" variant="outline" onClick={onOpen} className="rounded-full border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white backdrop-blur-md">
                 Agendar avaliação
             </Button>
-            <Button size="lg" variant="secondary" onClick={onOpen} className="rounded-full">
+            <Button size="lg" variant="outline" onClick={onOpen} className="rounded-full border-white/20 bg-transparent text-white hover:bg-white/10 backdrop-blur-md">
                 Falar com especialista
             </Button>
           </div>
