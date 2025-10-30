@@ -5,8 +5,18 @@ import Script from "next/script";
 export function HowItWorksSection() {
   return (
     <section id="how-it-works" className="w-full py-16 md:py-24 bg-background">
-      <div className="container max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12 animate-in fade-in slide-in-from-left-8 duration-1000 ease-in-out">
+      <div className="container max-w-4xl mx-auto px-4 flex flex-col items-center gap-12">
+        <div className="w-full flex justify-center items-center animate-in fade-in slide-in-from-left-8 duration-1000 ease-in-out">
+          <Image
+            src="https://i.postimg.cc/bJFNLCc0/2020-Honda-Civic-Type-R-011-2160.jpg"
+            alt="Carro esportivo moderno em exibição"
+            width={600}
+            height={400}
+            className="rounded-[3rem] object-cover aspect-video"
+          />
+        </div>
+
+        <div className="text-center animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
                 Venda seu Carro de Forma Rápida, Justa e Digital
             </h2>
@@ -15,32 +25,21 @@ export function HowItWorksSection() {
             </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="flex justify-center items-center animate-in fade-in slide-in-from-left-8 duration-1000 ease-in-out">
-             <Image
-                src="https://i.postimg.cc/bJFNLCc0/2020-Honda-Civic-Type-R-011-2160.jpg"
-                alt="Carro esportivo moderno em exibição"
-                width={600}
-                height={400}
-                className="rounded-[3rem] object-cover aspect-video"
-              />
-          </div>
-          <div className="flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out">
-              <div className="relative w-full max-w-xs">
-                  <div style={{padding:'177.78% 0 0 0',position:'relative'}}>
-                      <iframe 
-                          src="https://player.vimeo.com/video/1132253360?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=1" 
-                          frameBorder="0" 
-                          allow="autoplay; fullscreen; picture-in-picture; clipboard-write" 
-                          style={{position:'absolute',top:0,left:0,width:'100%',height:'100%'}} 
-                          title="PDC-VIDEO-02-JANEIRO"
-                          className="rounded-[3rem] shadow-2xl border"
-                          >
-                      </iframe>
-                  </div>
-                  <Script src="https://player.vimeo.com/api/player.js"></Script>
-              </div>
-          </div>
+        <div className="w-full max-w-xs flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out">
+            <div className="relative w-full">
+                <div style={{padding:'177.78% 0 0 0',position:'relative'}}>
+                    <iframe 
+                        src="https://player.vimeo.com/video/1132253360?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=1" 
+                        frameBorder="0" 
+                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write" 
+                        style={{position:'absolute',top:0,left:0,width:'100%',height:'100%'}} 
+                        title="PDC-VIDEO-02-JANEIRO"
+                        className="rounded-[3rem] shadow-2xl border"
+                        >
+                    </iframe>
+                </div>
+                <Script src="https://player.vimeo.com/api/player.js"></Script>
+            </div>
         </div>
       </div>
     </section>
