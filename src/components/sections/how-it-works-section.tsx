@@ -1,6 +1,6 @@
 import { HOW_IT_WORKS_STEPS } from "@/lib/data";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Script from "next/script";
 
 export function HowItWorksSection() {
   return (
@@ -43,16 +43,18 @@ export function HowItWorksSection() {
         </div>
         <div className="mt-16 md:mt-24 flex justify-center animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out">
             <div className="relative w-full max-w-xs">
-                <div className="aspect-[9/16] w-full">
+                <div style={{padding:'177.78% 0 0 0',position:'relative'}}>
                     <iframe 
-                        className="w-full h-full rounded-2xl shadow-2xl border"
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="YouTube video player" 
+                        src="https://player.vimeo.com/video/1132253360?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=1" 
                         frameBorder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowFullScreen>
+                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write" 
+                        style={{position:'absolute',top:0,left:0,width:'100%',height:'100%'}} 
+                        title="PDC-VIDEO-02-JANEIRO"
+                        className="rounded-2xl shadow-2xl border"
+                        >
                     </iframe>
                 </div>
+                <Script src="https://player.vimeo.com/api/player.js"></Script>
             </div>
         </div>
       </div>
