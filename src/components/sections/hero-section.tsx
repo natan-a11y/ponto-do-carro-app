@@ -15,7 +15,7 @@ export function HeroSection() {
   ];
 
   return (
-    <section className="relative w-full h-screen flex items-center justify-center -mt-16">
+    <section className="relative w-full h-screen flex items-center justify-end -mt-16">
         {heroImage && (
              <Image
                 src={heroImage.imageUrl}
@@ -26,13 +26,13 @@ export function HeroSection() {
                 data-ai-hint={heroImage.imageHint}
             />
         )}
-        <div className="absolute inset-0 bg-primary/5 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-l from-primary/20 to-transparent z-10" />
 
-      <div className="container relative z-20 mx-auto px-4 text-center text-primary-foreground pt-32">
+      <div className="container relative z-20 mx-auto px-4 text-right text-primary-foreground pt-32 max-w-2xl">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline">
           Venda seu carro em até 24h
         </h1>
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-base">
+        <div className="mt-8 flex flex-col items-end gap-4 text-base">
           {benefits.map((benefit, index) => (
             <div key={index} className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-accent" />
@@ -40,7 +40,7 @@ export function HeroSection() {
             </div>
           ))}
         </div>
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-end gap-4">
           <Button size="lg" variant="accent" asChild>
             <Link href={getWhatsAppLink()}>
               Falar no WhatsApp
