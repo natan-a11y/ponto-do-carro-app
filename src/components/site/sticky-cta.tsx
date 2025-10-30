@@ -8,21 +8,6 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function StickyCTA() {
-  return (
-    <div className="fixed bottom-0 left-0 right-0 md:hidden bg-background/80 backdrop-blur-sm p-3 border-t z-40">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center gap-3">
-          <Button variant="outline" className="w-full bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600" asChild>
-            <a href={getWhatsAppLink()} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
-              <WhatsAppIcon className="w-5 h-5"/>
-              WhatsApp
-            </a>
-          </Button>
-          <Button className="w-full" asChild>
-            <Link href="/agendar-avaliacao">Agendar</Link>
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+  // Return null to hide the component
+  return null;
 }

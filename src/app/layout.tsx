@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import SiteHeader from '@/components/site/header';
 import SiteFooter from '@/components/site/footer';
-import StickyCTA from '@/components/site/sticky-cta';
+import WhatsAppFab from '@/components/site/whatsapp-fab';
 import './globals.css';
 import { cn } from '@/lib/utils';
 
@@ -35,7 +35,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </div>
-        <StickyCTA />
+        <WhatsAppFab />
         <Toaster />
       </body>
     </html>
