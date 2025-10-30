@@ -48,7 +48,10 @@ export function HowItWorksSection() {
                       Veja na Prática
                   </h3>
                   <p className="mt-4 text-lg text-muted-foreground">
-                      Nosso processo foi desenhado para ser o mais rápido e transparente possível. Em menos tempo do que você imagina, seu carro é avaliado, anunciado para centenas de lojistas e vendido pelo melhor preço, sem que você precise sair de casa para negociar. Assista ao lado e veja como transformamos um processo complicado em algo simples e digital.
+                    Quer <span className="font-bold text-primary">vender seu carro hoje</span>? O vídeo ao lado demonstra como nosso processo digital e transparente funciona. Acompanhe a <span className="font-bold">vistoria completa de 15 minutos</span>, onde cada detalhe do seu veículo é avaliado para garantir a melhor oferta. Em seguida, seu carro é leiloado em nossa plataforma para mais de 500 lojistas, criando uma disputa justa que valoriza seu patrimônio.
+                  </p>
+                   <p className="mt-4 text-lg text-muted-foreground">
+                    O resultado é uma <span className="font-bold">proposta de compra rápida</span> e o <span className="font-bold">pagamento imediato</span> após a sua aprovação. Chega de negociar com vários compradores e perder tempo com burocracia. Na Ponto do Carro, você tem dinheiro na mão de forma segura e eficiente.
                   </p>
               </div>
           </div>
