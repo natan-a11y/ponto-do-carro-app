@@ -13,7 +13,7 @@ export function HowItWorksSection() {
                     alt="Carro sendo avaliado"
                     width={1080}
                     height={720}
-                    className="rounded-lg shadow-2xl"
+                    className="rounded-full shadow-2xl"
                     data-ai-hint="car inspection"
                 />
             </div>
