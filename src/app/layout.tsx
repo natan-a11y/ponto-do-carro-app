@@ -31,10 +31,8 @@ export default function RootLayout({
         )}
       >
         <SiteHeader />
-        <div className="relative flex min-h-dvh flex-col">
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </div>
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
         <StickyCTA />
         <Toaster />
       </body>
