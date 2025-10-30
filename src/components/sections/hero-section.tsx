@@ -29,7 +29,7 @@ export function HeroSection() {
         )}
         <div className="absolute inset-0 bg-gradient-to-l from-primary/20 to-transparent z-10" />
 
-      <div className="container relative z-20 px-4 max-w-7xl h-full flex flex-col justify-center items-end text-right">
+      <div className="container relative z-20 max-w-7xl h-full flex flex-col justify-center items-end text-right">
         <div className="pt-32 max-w-2xl">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline text-primary-foreground">
             Venda seu carro em até <span className="text-accent">24h</span>
