@@ -85,7 +85,7 @@ export default function UnitPage({ params }: Props) {
       <div className="container max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
           <div className="lg:col-span-3">
-            <h1 className="text-3xl sm:text-4xl font-bold font-headline mb-2">Venda seu carro no <span className="text-primary">{unit.name.replace('Unidade ', '')}</span> em até 24h úteis</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold font-headline mb-2">Venda seu carro no <span className="text-primary">{unit.name.replace('Unidade ', '')}</span> em até 24h</h1>
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center mb-8">
                 <div className="flex items-center gap-2 text-muted-foreground"><MapPin className="h-4 w-4"/> {unit.address}</div>
             </div>

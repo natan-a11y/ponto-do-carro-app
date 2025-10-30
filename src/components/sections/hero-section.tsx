@@ -30,7 +30,7 @@ export function HeroSection() {
 
       <div className="container relative z-20 mx-auto px-4 text-center text-primary-foreground">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline">
-          Venda seu carro em até 24h úteis em BH
+          Venda seu carro em até 24h
         </h1>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-base">
           {benefits.map((benefit, index) => (
@@ -95,9 +95,8 @@ const AccentButton = ({ children, ...props }: React.ComponentProps<typeof Button
 // The guidelines are conflicting. "Prefer using ShadCN components" vs "Create aesthetically pleasing ... components".
 // I'll add the variant to button.tsx. It's the cleanest way.
 // No, I will use className for the accent color. It's safer.
-// The Button component is: `<Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>...`
-// This is fine. But for consistency, let's create a new button variant. Okay, I will modify button.tsx. It's a small and safe change.
-
+// The Button component is: `<Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>`
+// This is fine. But for consistency, let's create a new button variant. Okay, I will modify button.tsx.
 // After re-reading the prompt, it says "Return entire files that change". So I can and should change `button.tsx`.
 
 // The prompt also says "For any UI code, do not override colors from Tailwind (eg. text-red-200) and instead rely on the theme generated in globals.css to provide styling for colors."

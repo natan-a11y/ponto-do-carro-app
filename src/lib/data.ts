@@ -40,7 +40,7 @@ export const UNITS: Unit[] = [
 ];
 
 export const FAQS: FAQItem[] = [
-  { id: '1', question: 'Como funciona a venda em até 24h úteis?', answer: 'Após a vistoria de 15 minutos, seu carro é ofertado para nossa rede de +500 lojistas. A melhor proposta é apresentada a você em até 24h úteis. Aceitando, o pagamento é feito à vista via PIX ou TED.' },
+  { id: '1', question: 'Como funciona a venda em até 24h?', answer: 'Após a vistoria de 15 minutos, seu carro é ofertado para nossa rede de +500 lojistas. A melhor proposta é apresentada a você em até 24h. Aceitando, o pagamento é feito à vista via PIX ou TED.' },
   { id: '2', question: 'Preciso pagar algo pela avaliação?', answer: 'Não. A avaliação e a vistoria são totalmente gratuitas e sem compromisso.' },
   { id: '3', question: 'Quais documentos são necessários?', answer: 'Para a avaliação, apenas o documento do veículo (CRLV). Para a venda, você precisará do seu documento de identidade (CNH ou RG) e o CRV (recibo de compra e venda).' },
   { id: '4', question: 'Meu carro tem dívidas. Posso vender?', answer: 'Sim. O valor das dívidas (IPVA, multas) pode ser abatido da proposta final, e nós cuidamos da quitação.' },
@@ -58,7 +58,7 @@ export const REVIEWS: Review[] = [
 export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
     { id: '1', title: '1. Agende grátis', description: 'Escolha a unidade mais próxima e agende online ou pelo WhatsApp.', icon: Calendar },
     { id: '2', title: '2. Vistoria em 15 min', description: 'Nossa equipe faz uma inspeção completa e transparente do seu veículo.', icon: Search },
-    { id: '3', title: '3. Proposta e Pagamento', description: 'Receba a melhor oferta em até 24h úteis. Pagamento à vista via PIX/TED.', icon: Handshake },
+    { id: '3', title: '3. Proposta e Pagamento', description: 'Receba a melhor oferta em até 24h. Pagamento à vista via PIX/TED.', icon: Handshake },
 ];
 
 export const NAV_ITEMS: NavItem[] = [

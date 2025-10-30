@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
-  title: 'Venda seu Carro em BH em até 24h | Ponto do Carro',
+  title: 'Venda seu Carro em até 24h | Ponto do Carro',
   description: 'Avaliação grátis em 15 min, +500 lojistas e pagamento à vista. Agende online ou chame no WhatsApp.',
 };
 
