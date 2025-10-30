@@ -12,27 +12,8 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function WhatsAppFab() {
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        const toggleVisibility = () => {
-            if (window.scrollY > 300) {
-                setIsVisible(true);
-            } else {
-                setIsVisible(false);
-            }
-        };
-
-        window.addEventListener("scroll", toggleVisibility);
-
-        return () => window.removeEventListener("scroll", toggleVisibility);
-    }, []);
-
     return (
-        <div className={cn(
-            "fixed bottom-6 right-6 z-50 transition-opacity duration-300",
-            isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}>
+        <div className="fixed bottom-6 right-6 z-50">
             <Button asChild size="icon" className="rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 text-white shadow-lg">
                 <a href={getWhatsAppLink(undefined, 'Olá! Gostaria de mais informações.')} target="_blank" rel="noopener noreferrer">
                     <WhatsAppIcon className="w-8 h-8" />
