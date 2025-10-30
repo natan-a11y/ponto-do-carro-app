@@ -15,16 +15,16 @@ export function HeroSection() {
 
   return (
     <div 
-      className="relative w-full h-screen flex items-center justify-center -mt-20"
+      className="relative w-full h-screen flex items-center justify-start -mt-20"
       style={{ 
         backgroundImage: `url(https://i.postimg.cc/pT3ZYr3k/2020-Honda-Civic-Type-R-001-2160.jpg)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center'
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent z-10" />
 
-      <div className="container relative z-20 h-full flex flex-col justify-center items-start text-left pt-12 max-w-7xl">
+      <div className="container relative z-20 h-full flex flex-col justify-center items-start text-left max-w-7xl">
         <div className="max-w-2xl">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline text-primary-foreground animate-in fade-in slide-in-from-bottom-12 duration-1000">
             Venda seu carro em até <span className="text-accent">24h</span>
