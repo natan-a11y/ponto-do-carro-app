@@ -28,9 +28,7 @@ export function HeroSection() {
       <div className="container relative z-20 h-full flex flex-col justify-center items-end text-right max-w-7xl">
         <div className="max-w-2xl mt-48">
            <h1 className={cn(
-            "text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline text-primary-foreground",
-            "overflow-hidden whitespace-nowrap border-r-4 border-r-white pr-2",
-            "animate-typing"
+            "text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline text-primary-foreground"
           )}>
             Venda seu carro em até <span className="text-accent">24h</span>
           </h1>
@@ -50,11 +48,11 @@ export function HeroSection() {
             className="mt-10 flex flex-col items-end gap-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 ease-in-out"
             style={{ animationDelay: '900ms' }}
             >
-             <Button size="lg" variant="ghost" onClick={onOpen} className="rounded-full hover:bg-white/10 text-white">
+             <Button size="lg" variant="accent" onClick={onOpen} className="rounded-full">
                 Falar no WhatsApp
             </Button>
-            <Button size="lg" variant="accent" onClick={onOpen} className="rounded-full">
-                Agendar avaliação
+            <Button size="lg" variant="default" onClick={onOpen} className="rounded-full">
+               Agendar avaliação
             </Button>
           </div>
         </div>
