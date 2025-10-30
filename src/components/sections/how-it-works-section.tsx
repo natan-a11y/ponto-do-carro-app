@@ -18,11 +18,23 @@ export function HowItWorksSection() {
 
         <div className="text-center animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
-                Venda seu Carro de Forma Rápida, Justa e Digital
+                Como Funciona
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-                Na Ponto do Carro, transformamos a complexa tarefa de vender seu veículo em uma experiência ágil e surpreendentemente simples. Nosso processo foi desenhado para maximizar seu tempo e seu retorno financeiro, garantindo a melhor oferta do mercado em até 24h com pagamento à vista.
+                Vender seu carro nunca foi tão fácil. Siga nossos 3 passos simples.
             </p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8 w-full">
+            {HOW_IT_WORKS_STEPS.map((step) => (
+                <div key={step.id} className="flex flex-col items-center text-center p-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground mb-4">
+                        <step.icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-lg font-semibold">{step.title}</h3>
+                    <p className="text-muted-foreground text-sm mt-1">{step.description}</p>
+                </div>
+            ))}
         </div>
 
         <div className="w-full max-w-xs flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out">
