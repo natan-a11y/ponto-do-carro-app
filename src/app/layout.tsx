@@ -30,9 +30,11 @@ export default function RootLayout({
           "min-h-screen font-body antialiased",
         )}
       >
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
+        <div className="relative flex min-h-dvh flex-col bg-background">
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+        </div>
         <StickyCTA />
         <Toaster />
       </body>
