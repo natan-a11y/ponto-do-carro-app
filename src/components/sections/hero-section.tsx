@@ -23,6 +23,7 @@ export function HeroSection() {
                 fill
                 className="object-cover z-0"
                 priority
+                quality={100}
                 data-ai-hint={heroImage.imageHint}
             />
         )}
