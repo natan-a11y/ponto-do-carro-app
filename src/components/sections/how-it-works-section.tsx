@@ -50,7 +50,7 @@ export function HowItWorksSection() {
                         allow="autoplay; fullscreen; picture-in-picture; clipboard-write" 
                         style={{position:'absolute',top:0,left:0,width:'100%',height:'100%'}} 
                         title="PDC-VIDEO-02-JANEIRO"
-                        className="rounded-2xl shadow-2xl border"
+                        className="rounded-[3rem] shadow-2xl border"
                         >
                     </iframe>
                 </div>
