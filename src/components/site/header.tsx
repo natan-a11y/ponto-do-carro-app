@@ -1,9 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-import { Menu, Car } from "lucide-react";
+import { Menu } from "lucide-react";
 import { NAV_ITEMS, getWhatsAppLink } from "@/lib/data";
 import { Logo } from "./logo";
 import { usePathname } from 'next/navigation';
@@ -11,9 +12,23 @@ import { cn } from "@/lib/utils";
 
 export default function SiteHeader() {
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className={cn(
+      "sticky top-0 z-50 w-full transition-all duration-300",
+      scrolled 
+        ? "border-b border-border/40 bg-background/80 backdrop-blur-lg" 
+        : "bg-transparent border-b border-transparent"
+    )}>
       <div className="container flex h-16 max-w-7xl items-center justify-between">
         <Logo />
         <nav className="hidden md:flex md:items-center md:gap-6">
