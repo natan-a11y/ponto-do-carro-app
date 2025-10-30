@@ -1,12 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { placeholderImages } from "@/lib/placeholder-images.json";
 import { CheckCircle } from "lucide-react";
 import { useContactModal } from "../site/contact-modal";
-
-const heroImage = placeholderImages.find(p => p.id === 'hero-background');
 
 export function HeroSection() {
   const { onOpen } = useContactModal();
@@ -19,13 +15,17 @@ export function HeroSection() {
 
   return (
     <div 
-      className="relative w-full h-screen flex items-center justify-center -mt-16 bg-cover bg-center"
-      style={{ backgroundImage: `url(${heroImage?.imageUrl})` }}
+      className="relative w-full h-screen flex items-center justify-end -mt-20"
+      style={{ 
+        backgroundImage: `url(https://i.postimg.cc/pT3ZYr3k/2020-Honda-Civic-Type-R-001-2160.jpg)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
     >
       <div className="absolute inset-0 bg-gradient-to-l from-primary/20 to-transparent z-10" />
 
-      <div className="container relative z-20 max-w-7xl h-full flex flex-col justify-center items-end">
-        <div className="max-w-2xl text-right">
+      <div className="container relative z-20 h-full flex flex-col justify-center items-end">
+        <div className="max-w-2xl text-right pt-24">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline text-primary-foreground">
             Venda seu carro em até <span className="text-accent">24h</span>
           </h1>
