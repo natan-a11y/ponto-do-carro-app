@@ -9,8 +9,8 @@
     {
       "id": "unit-buritis",
       "description": "Photo of the Buritis unit storefront",
-      "imageUrl": "https://images.unsplash.com/photo-1542581542-0d526913eb3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzdG9yZWZyb250JTIwYnVpbGRpbmd8ZW58MHx8fHwxNzYxOTI2NjY1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "storefront building"
+      "imageUrl": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb21tZXJjaWFsJTIwYnVpbGRpbmd8ZW58MHx8fHwxNzYxOTI2NjY1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "commercial building"
     },
     {
       "id": "unit-caicara",
@@ -21,8 +21,8 @@
     {
       "id": "unit-alipio-de-melo",
       "description": "Photo of the Alipio de Melo unit storefront",
-      "imageUrl": "https://images.unsplash.com/photo-1687114835860-4c22e258781f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxzdG9yZWZyb250fGVufDB8fHx8MTc2MTgzNDgyMXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "storefront"
+      "imageUrl": "https://images.unsplash.com/photo-1590664813331-a621b1e3aa41?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21tZXJjaWFsJTIwYnVpbGRpbmd8ZW58MHx8fHwxNzYxOTI2NjY1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "commercial building"
     },
     {
       "id": "unit-ceu-azul",
