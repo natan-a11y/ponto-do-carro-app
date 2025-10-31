@@ -19,6 +19,18 @@
       "imageHint": "modern office"
     },
     {
+      "id": "unit-alipio-de-melo",
+      "description": "Photo of the Alipio de Melo unit storefront",
+      "imageUrl": "https://images.unsplash.com/photo-1521791055366-0d553872125f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzdG9yZWZyb250fGVufDB8fHx8MTcyMDczMTI1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "storefront"
+    },
+    {
+      "id": "unit-ceu-azul",
+      "description": "Photo of the Ceu Azul unit storefront",
+      "imageUrl": "https://images.unsplash.com/photo-1604351873307-a579d5e3314f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb21tZXJjaWFsJTIwYnVpbGRpbmd8ZW58MHx8fHwxNzIwNzMxMzMwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "commercial building"
+    },
+    {
       "id": "review-1",
       "description": "Avatar for reviewer 1",
       "imageUrl": "https://images.unsplash.com/photo-1557053908-4793c484d06f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2MTgwMzQ2MHww&ixlib=rb-4.1.0&q=80&w=1080",

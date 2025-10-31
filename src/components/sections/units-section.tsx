@@ -17,7 +17,7 @@ export function UnitsSection() {
             Escolha a unidade mais perto de você para uma avaliação rápida e gratuita.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {UNITS.map((unit, index) => (
             <div key={unit.id} className="animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out" style={{animationDelay: `${index * 150}ms`}}>
               <Card className="overflow-hidden shadow-lg transition-shadow duration-300 hover:shadow-2xl h-full flex flex-col group">
