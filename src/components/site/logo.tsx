@@ -5,7 +5,7 @@ export function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2" prefetch={false}>
       <Image
-        src="https://pontodocarro.com.br/wp-content/uploads/2023/10/PDC_marca_RGB_final_sem_o_br.png"
+        src="https://i.postimg.cc/wx0fK0C0/PDC-marca-RGB-final-sem-o-br-1.png"
         alt="Ponto do Carro Logo"
         width={160}
         height={38}
