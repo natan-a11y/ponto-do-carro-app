@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useActionState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useFormState } from "react-dom";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +40,7 @@ type FormData = z.infer<typeof formSchema>;
 export function AppointmentForm({ units }: { units: Unit[] }) {
   const [step, setStep] = useState(1);
   const [isPending, startTransition] = useTransition();
-  const [state, formAction] = useFormState(scheduleAppointment, { message: null });
+  const [state, formAction] = useActionState(scheduleAppointment, { message: null });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -253,4 +252,6 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
           <AlertDescription>{state.message}</AlertDescription>
         </Alert>
       )}
-    
+    </form>
+  );
+}
