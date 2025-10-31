@@ -22,7 +22,7 @@ export default function WhatsAppFab() {
         <div className="fixed bottom-6 right-6 z-50">
             <Button asChild size="icon" className="rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 text-white shadow-lg flex items-center justify-center">
                 <a href={getWhatsAppLink(undefined, 'Olá! Gostaria de mais informações.')} target="_blank" rel="noopener noreferrer">
-                    <WhatsAppIcon className="w-7 h-7" />
+                    <WhatsAppIcon className="w-8 h-8" />
                     <span className="sr-only">Falar no WhatsApp</span>
                 </a>
             </Button>
