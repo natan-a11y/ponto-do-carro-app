@@ -48,11 +48,12 @@ export const FAQS: FAQItem[] = [
 ];
 
 const originalReviews: Review[] = [
-  { id: '1', author: 'Mariana P.', text: 'Processo super rápido e transparente. Vendi meu carro em menos de 24h e o dinheiro caiu na conta no mesmo dia. Recomendo!', avatarUrl: getPlaceholderImage('review-1').url, avatarHint: getPlaceholderImage('review-1').hint },
-  { id: '2', author: 'Carlos F.', text: 'Fui muito bem atendido na unidade Buritis. A avaliação foi realmente rápida e a proposta foi justa. Melhor que vender pra particular.', avatarUrl: getPlaceholderImage('review-2').url, avatarHint: getPlaceholderImage('review-2').hint },
-  { id: '3', author: 'Juliana S.', text: 'Tinha receio, mas a experiência foi ótima. Sem burocracia e com segurança. Equipe profissional.', avatarUrl: getPlaceholderImage('review-3').url, avatarHint: getPlaceholderImage('review-3').hint },
-  { id: '4', author: 'Rafael L.', text: 'Consegui um valor melhor do que em outras concessionárias. O fato de vários lojistas disputarem o carro faz diferença.', avatarUrl: getPlaceholderImage('review-4').url, avatarHint: getPlaceholderImage('review-4').hint },
-  { id: '5', author: 'Beatriz M.', text: 'Praticidade total. Agendei online, fui atendida no horário e resolvi a venda do meu carro sem dor de cabeça.', avatarUrl: getPlaceholderImage('review-5').url, avatarHint: getPlaceholderImage('review-5').hint },
+    { id: '1', author: 'Vinícius Martins', text: 'O atendimento foi sensacional, o processo foi rápido e objetivo! A avaliação do carro foi justa e o principal, o dinheiro caiu na hora! Recomendo demais!', avatarUrl: '', avatarHint: '' },
+    { id: '2', author: 'Guilherme H. B. Souza', text: 'Vendi meu carro com eles e foi a melhor experiência possível. Atendimento excelente e o processo de avaliação e venda foi super rápido e transparente. Recomendo muito!', avatarUrl: '', avatarHint: '' },
+    { id: '3', author: 'Mateus Santos', text: 'Ótimo atendimento, em especial da Isadora. Tudo muito rápido e prático. Recomendo.', avatarUrl: '', avatarHint: '' },
+    { id: '4', author: 'Lucas Otávio', text: 'Atendimento excelente! Venda rápida e segura, com certeza recomendo!', avatarUrl: '', avatarHint: '' },
+    { id: '5', author: 'Pedro Ivo Vilela', text: 'Processo rápido, transparente e com um ótimo atendimento! Recomendo!', avatarUrl: '', avatarHint: '' },
+    { id: '6', author: 'Leonardo Rezende', text: 'Excelente atendimento, proposta justa e pagamento super rápido. Recomendo a todos!', avatarUrl: '', avatarHint: '' },
 ];
 
 export const REVIEWS: Review[] = [...originalReviews, ...originalReviews];
