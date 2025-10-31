@@ -9,7 +9,7 @@
     {
       "id": "unit-buritis",
       "description": "Photo of the Buritis unit storefront",
-      "imageUrl": "https://images.unsplash.com/photo-1761824197889-1cecb0d41616?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c3RvcmVmcm9udCUyMGJ1aWxkaW5nfGVufDB8fHx8MTc2MTkyNjY2NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1542581542-0d526913eb3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzdG9yZWZyb250JTIwYnVpbGRpbmd8ZW58MHx8fHwxNzYxOTI2NjY1fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "storefront building"
     },
     {
@@ -27,7 +27,7 @@
     {
       "id": "unit-ceu-azul",
       "description": "Photo of the Ceu Azul unit storefront",
-      "imageUrl": "https://images.unsplash.com/photo-1698399109979-6d4c1a64636a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y29tbWVyY2lhbCUyMGJ1aWxkaW5nfGVufDB8fHx8MTc2MTkyNjY2NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb21tZXJjaWFsJTIwYnVpbGRpbmd8ZW58MHx8fHwxNzYxOTI2NjY1fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "commercial building"
     },
     {
