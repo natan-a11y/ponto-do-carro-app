@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { HOW_IT_WORKS_STEPS } from "@/lib/data";
 import { Button } from "../ui/button";
 import { useContactModal } from "../site/contact-modal";
-import { VolumeX } from "lucide-react";
+import { VolumeX, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Player from "@vimeo/player";
 
@@ -30,10 +30,14 @@ export function HowItWorksSection() {
 
   const handleToggleMute = () => {
     if (playerRef.current) {
-      // Set volume to 1 (unmute) and ensure video continues playing
-      playerRef.current.setVolume(1);
-      playerRef.current.play(); // Explicitly call play to prevent pausing
-      setIsMuted(false);
+      if (isMuted) {
+        playerRef.current.setVolume(1);
+        setIsMuted(false);
+      } else {
+        playerRef.current.setVolume(0);
+        setIsMuted(true);
+      }
+      playerRef.current.play(); // Ensure it continues playing
     }
   };
 
@@ -86,18 +90,13 @@ export function HowItWorksSection() {
                           >
                       </iframe>
                   </div>
-                  {isMuted && (
-                    <div 
+                    <button
                       onClick={handleToggleMute}
-                      className={cn(
-                        "absolute inset-0 flex items-center justify-center bg-black/30 rounded-[2rem] cursor-pointer transition-opacity duration-300",
-                      )}
+                      className="absolute bottom-4 right-4 z-10 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                      aria-label={isMuted ? "Ativar som" : "Desativar som"}
                     >
-                        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/30 backdrop-blur-sm">
-                          <VolumeX className="w-8 h-8 text-white" />
-                        </div>
-                    </div>
-                  )}
+                      {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                    </button>
               </div>
           </div>
         </div>
