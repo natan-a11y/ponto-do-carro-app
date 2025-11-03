@@ -30,6 +30,18 @@ export default function SiteHeader() {
     onOpen();
     setMobileMenuOpen(false);
   };
+  
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('/#')) {
+      e.preventDefault();
+      const targetId = href.substring(2);
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth' });
+      }
+      setMobileMenuOpen(false);
+    }
+  };
 
   return (
     <header className={cn(
@@ -45,9 +57,10 @@ export default function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={(e) => handleLinkClick(e, item.href)}
               className={cn(
                 "text-sm font-medium transition-colors hover:text-primary",
-                pathname === item.href ? "text-primary" : "text-foreground/60"
+                 pathname === item.href || (pathname === '/' && item.href.startsWith('/#')) ? "text-primary" : "text-foreground/60"
               )}
             >
               {item.title}
@@ -58,8 +71,8 @@ export default function SiteHeader() {
            <Button variant="accent" onClick={onOpen}>
             Falar no WhatsApp
           </Button>
-          <Button onClick={onOpen}>
-            Agendar Avaliação
+          <Button asChild>
+            <Link href="/agendar-avaliacao">Agendar Avaliação</Link>
           </Button>
         </div>
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -70,9 +83,9 @@ export default function SiteHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="right">
-            <SheetHeader className="sr-only">
-              <SheetTitle>Menu</SheetTitle>
-              <SheetDescription>Navegação principal e links de contato.</SheetDescription>
+            <SheetHeader>
+              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <SheetDescription className="sr-only">Navegação principal e links de contato.</SheetDescription>
             </SheetHeader>
             <div className="flex flex-col h-full">
               <div className="mb-8">
@@ -83,7 +96,13 @@ export default function SiteHeader() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={(e) => {
+                      if (item.href.startsWith('/#')) {
+                         handleLinkClick(e, item.href);
+                      } else {
+                        setMobileMenuOpen(false);
+                      }
+                    }}
                     className={cn(
                       "text-lg font-medium transition-colors hover:text-primary",
                       pathname === item.href ? "text-primary" : "text-foreground/80"
@@ -97,8 +116,8 @@ export default function SiteHeader() {
                 <Button variant="accent" onClick={handleMenuClick}>
                   Falar no WhatsApp
                 </Button>
-                <Button onClick={handleMenuClick}>
-                  Agendar Avaliação
+                <Button asChild onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/agendar-avaliacao">Agendar Avaliação</Link>
                 </Button>
               </div>
             </div>

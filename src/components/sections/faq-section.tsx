@@ -38,7 +38,7 @@ export function FaqSection({ maxItems }: { maxItems?: number }) {
            </div>
            <Accordion type="single" collapsible className="w-full">
             {items.map((faq) => (
-              <AccordionItem key={faq.id} value={faq.id} className="bg-background rounded-lg shadow-sm px-6 border">
+              <AccordionItem key={faq.id} value={faq.id} className="bg-background rounded-lg mb-3 shadow-sm px-4 border">
                 <AccordionTrigger className="text-left font-semibold text-lg hover:no-underline text-foreground">
                   {faq.question}
                 </AccordionTrigger>

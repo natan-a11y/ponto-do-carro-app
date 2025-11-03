@@ -77,11 +77,11 @@ export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
 ];
 
 export const NAV_ITEMS: NavItem[] = [
-    { title: 'Como Funciona', href: '/como-funciona' },
-    { title: 'Unidades', href: '/unidades' },
-    { title: 'Avaliações', href: '/avaliacoes' },
+    { title: 'Como Funciona', href: '/#how-it-works' },
+    { title: 'Unidades', href: '/#units' },
+    { title: 'Avaliações', href: '/#avaliacoes' },
     { title: 'Para Lojistas', href: '/para-lojistas' },
-    { title: 'FAQ', href: '/faq' },
+    { title: 'FAQ', href: '/#faq' },
 ];
 
 export const B2B_BENEFITS: B2BBenefit[] = [

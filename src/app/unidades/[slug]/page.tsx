@@ -109,6 +109,11 @@ export default function UnitPage({ params }: Props) {
                 </AccordionItem>
               ))}
             </Accordion>
+            <div className="mt-8">
+                 <Button asChild>
+                    <Link href="/#faq">Ver mais perguntas</Link>
+                </Button>
+            </div>
           </div>
           <div className="lg:col-span-2">
             <div className="sticky top-24 space-y-6">
@@ -120,8 +125,8 @@ export default function UnitPage({ params }: Props) {
                         <Button onClick={onOpen} size="lg" variant="accent">
                             Falar com {unit.name.replace('Unidade ', '')}
                         </Button>
-                        <Button onClick={onOpen} size="lg" variant="default">
-                           Agendar Avaliação
+                        <Button asChild size="lg" variant="default">
+                           <Link href="/agendar-avaliacao">Agendar Avaliação</Link>
                         </Button>
                     </CardContent>
                 </Card>

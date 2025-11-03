@@ -11,7 +11,7 @@ export default function Home() {
       <HowItWorksSection />
       <SocialProofSection />
       <UnitsSection />
-      <FaqSection />
+      <FaqSection maxItems={5}/>
     </div>
   );
 }

@@ -15,6 +15,7 @@ export function SocialProofSection() {
   
   return (
     <TestimonialsSection
+      id="avaliacoes"
       title="O que nossos clientes dizem"
       description="Confiança e agilidade comprovadas por quem já vendeu com a gente."
       testimonials={testimonials}
