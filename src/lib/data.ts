@@ -60,16 +60,14 @@ export const FAQS: FAQItem[] = [
   { id: '5', question: 'Onde ficam as unidades?', answer: `Atualmente, temos unidades nos bairros Buritis, Alípio de Melo e Céu Azul, em Belo Horizonte. Você pode agendar uma avaliação na mais próxima de você.`},
 ];
 
-const originalReviews: Review[] = [
-    { id: '1', author: 'Vinícius Martins', text: 'O atendimento foi sensacional, o processo foi rápido e objetivo! A avaliação do carro foi justa e o principal, o dinheiro caiu na hora! Recomendo demais!', avatarUrl: '', avatarHint: '' },
-    { id: '2', author: 'Guilherme H. B. Souza', text: 'Vendi meu carro com eles e foi a melhor experiência possível. Atendimento excelente e o processo de avaliação e venda foi super rápido e transparente. Recomendo muito!', avatarUrl: '', avatarHint: '' },
-    { id: '3', author: 'Mateus Santos', text: 'Ótimo atendimento, em especial da Isadora. Tudo muito rápido e prático. Recomendo.', avatarUrl: '', avatarHint: '' },
-    { id: '4', author: 'Lucas Otávio', text: 'Atendimento excelente! Venda rápida e segura, com certeza recomendo!', avatarUrl: '', avatarHint: '' },
-    { id: '5', author: 'Pedro Ivo Vilela', text: 'Processo rápido, transparente e com um ótimo atendimento! Recomendo!', avatarUrl: '', avatarHint: '' },
-    { id: '6', author: 'Leonardo Rezende', text: 'Excelente atendimento, proposta justa e pagamento super rápido. Recomendo a todos!', avatarUrl: '', avatarHint: '' },
+export const REVIEWS: Review[] = [
+    { id: '1', author: 'Vinícius Martins', text: 'O atendimento foi sensacional, o processo foi rápido e objetivo! A avaliação do carro foi justa e o principal, o dinheiro caiu na hora! Recomendo demais!', avatarUrl: getPlaceholderImage('review-1').url, avatarHint: getPlaceholderImage('review-1').hint },
+    { id: '2', author: 'Guilherme H. B. Souza', text: 'Vendi meu carro com eles e foi a melhor experiência possível. Atendimento excelente e o processo de avaliação e venda foi super rápido e transparente. Recomendo muito!', avatarUrl: getPlaceholderImage('review-2').url, avatarHint: getPlaceholderImage('review-2').hint },
+    { id: '3', author: 'Mateus Santos', text: 'Ótimo atendimento, em especial da Isadora. Tudo muito rápido e prático. Recomendo.', avatarUrl: getPlaceholderImage('review-3').url, avatarHint: getPlaceholderImage('review-3').hint },
+    { id: '4', author: 'Lucas Otávio', text: 'Atendimento excelente! Venda rápida e segura, com certeza recomendo!', avatarUrl: getPlaceholderImage('review-4').url, avatarHint: getPlaceholderImage('review-4').hint },
+    { id: '5', author: 'Pedro Ivo Vilela', text: 'Processo rápido, transparente e com um ótimo atendimento! Recomendo!', avatarUrl: getPlaceholderImage('review-5').url, avatarHint: getPlaceholderImage('review-5').hint },
+    { id: '6', author: 'Leonardo Rezende', text: 'Excelente atendimento, proposta justa e pagamento super rápido. Recomendo a todos!', avatarUrl: getPlaceholderImage('review-2').url, avatarHint: getPlaceholderImage('review-2').hint },
 ];
-
-export const REVIEWS: Review[] = [...originalReviews, ...originalReviews];
 
 
 export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
