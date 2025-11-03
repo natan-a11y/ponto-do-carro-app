@@ -1,4 +1,4 @@
-import { HowItWorksSection } from '@/components/sections/how-it-works-section';
+import { Hero } from '@/components/ui/hero-with-group-of-images-text-and-two-buttons';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function ComoFuncionaPage() {
   return (
     <div className="pt-10">
-      <HowItWorksSection />
+      <Hero />
     </div>
   );
 }
