@@ -30,14 +30,15 @@ export function HowItWorksSection() {
 
   const handleToggleMute = () => {
     if (playerRef.current) {
-      if (isMuted) {
-        playerRef.current.setVolume(1);
-        setIsMuted(false);
-      } else {
-        playerRef.current.setVolume(0);
-        setIsMuted(true);
-      }
-      playerRef.current.play(); // Ensure it continues playing
+        playerRef.current.getVolume().then((volume) => {
+            if (volume === 0) {
+                playerRef.current?.setVolume(1);
+                setIsMuted(false);
+            } else {
+                playerRef.current?.setVolume(0);
+                setIsMuted(true);
+            }
+        });
     }
   };
 
@@ -45,7 +46,7 @@ export function HowItWorksSection() {
     <section id="how-it-works" className="w-full py-16 md:py-24 bg-background">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 gap-12 items-center md:grid-cols-2">
-          <div className="flex gap-6 flex-col">
+          <div className="flex gap-6 flex-col animate-in fade-in slide-in-from-top-8 duration-1000 ease-in-out">
             <div className="flex gap-4 flex-col text-center md:text-left">
               <h2 className="text-3xl md:text-5xl tracking-tight font-bold">
                 Vender seu carro nunca foi tão fácil
@@ -76,7 +77,7 @@ export function HowItWorksSection() {
               </Button>
             </div>
           </div>
-          <div className="w-full flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out">
+          <div className="w-full flex justify-center animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out">
               <div className="relative w-full max-w-sm">
                   <div style={{padding:'177.78% 0 0 0',position:'relative'}}>
                       <iframe

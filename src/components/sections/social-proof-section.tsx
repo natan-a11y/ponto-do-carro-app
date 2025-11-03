@@ -18,6 +18,7 @@ export function SocialProofSection() {
       title="O que nossos clientes dizem"
       description="Confiança e agilidade comprovadas por quem já vendeu com a gente."
       testimonials={testimonials}
+      className="animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out"
     />
   );
 }
