@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/data";
 import { Logo } from "./logo";
@@ -70,6 +70,10 @@ export default function SiteHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="right">
+             <SheetHeader className="sr-only">
+              <SheetTitle>Menu</SheetTitle>
+              <SheetDescription>Navegação principal e links de contato.</SheetDescription>
+            </SheetHeader>
             <div className="flex flex-col h-full">
               <div className="mb-8">
                 <Logo />
