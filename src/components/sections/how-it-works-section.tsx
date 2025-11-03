@@ -1,12 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { HOW_IT_WORKS_STEPS } from "@/lib/data";
 import { Button } from "../ui/button";
 import Script from "next/script";
 import { useContactModal } from "../site/contact-modal";
+import { VolumeX, Volume2 } from "lucide-react";
 
 export function HowItWorksSection() {
     const { onOpen } = useContactModal();
+    const [isMuted, setIsMuted] = useState(true);
+
+    const handleVideoClick = () => {
+        setIsMuted(!isMuted);
+    };
+
   return (
     <section id="how-it-works" className="w-full py-16 md:py-24 bg-background">
       <div className="container mx-auto">
@@ -43,18 +51,25 @@ export function HowItWorksSection() {
             </div>
           </div>
           <div className="w-full flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out">
-              <div className="relative w-full max-w-sm">
+              <div className="relative w-full max-w-sm cursor-pointer" onClick={handleVideoClick}>
                   <div style={{padding:'177.78% 0 0 0',position:'relative'}}>
                       <iframe 
-                          src="https://player.vimeo.com/video/1132253360?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=1" 
+                          src={`https://player.vimeo.com/video/1132253360?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=${isMuted ? 1 : 0}&controls=0&title=0&byline=0&portrait=0`}
                           frameBorder="0" 
                           allow="autoplay; fullscreen; picture-in-picture; clipboard-write" 
                           style={{position:'absolute',top:0,left:0,width:'100%',height:'100%'}} 
-                          title="PDC-VIDEO-02-JANEIRO"
-                          className="rounded-[2rem] shadow-2xl border"
+                          title="Demonstração do processo de venda Ponto do Carro"
+                          className="rounded-[2rem] shadow-2xl border pointer-events-none"
                           >
                       </iframe>
                   </div>
+                   {isMuted && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-[2rem] transition-opacity duration-300">
+                          <div className="flex items-center justify-center w-16 h-16 bg-white/30 backdrop-blur-sm rounded-full">
+                              <VolumeX className="w-8 h-8 text-white" />
+                          </div>
+                      </div>
+                  )}
                   <Script src="https://player.vimeo.com/api/player.js"></Script>
               </div>
           </div>
