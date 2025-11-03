@@ -1,20 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { HOW_IT_WORKS_STEPS } from "@/lib/data";
 import { Button } from "../ui/button";
-import Script from "next/script";
 import { useContactModal } from "../site/contact-modal";
 import { VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Player from "@vimeo/player";
 
 export function HowItWorksSection() {
-    const { onOpen } = useContactModal();
-    const [isMuted, setIsMuted] = useState(true);
+  const { onOpen } = useContactModal();
+  const [isMuted, setIsMuted] = useState(true);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const playerRef = useRef<Player | null>(null);
 
-    const handleToggleMute = () => {
-        setIsMuted(false);
+  useEffect(() => {
+    if (iframeRef.current) {
+      const player = new Player(iframeRef.current);
+      playerRef.current = player;
+      player.ready().then(() => {
+        player.setVolume(0); // Ensure it starts muted
+        player.play();
+      });
+    }
+    return () => {
+      playerRef.current?.destroy();
     };
+  }, []);
+
+  const handleToggleMute = () => {
+    if (playerRef.current) {
+      playerRef.current.setVolume(1);
+      setIsMuted(false);
+    }
+  };
 
   return (
     <section id="how-it-works" className="w-full py-16 md:py-24 bg-background">
@@ -54,8 +73,9 @@ export function HowItWorksSection() {
           <div className="w-full flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000 ease-in-out">
               <div className="relative w-full max-w-sm">
                   <div style={{padding:'177.78% 0 0 0',position:'relative'}}>
-                      <iframe 
-                          src={`https://player.vimeo.com/video/1132253360?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=${isMuted ? 1 : 0}&controls=0&title=0&byline=0&portrait=0`}
+                      <iframe
+                          ref={iframeRef}
+                          src="https://player.vimeo.com/video/1132253360?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&loop=1&muted=1&controls=0&title=0&byline=0&portrait=0"
                           frameBorder="0" 
                           allow="autoplay; fullscreen; picture-in-picture; clipboard-write" 
                           style={{position:'absolute',top:0,left:0,width:'100%',height:'100%'}} 
@@ -64,18 +84,18 @@ export function HowItWorksSection() {
                           >
                       </iframe>
                   </div>
-                  <div 
-                    onClick={handleToggleMute}
-                    className={cn(
-                      "absolute inset-0 flex items-center justify-center bg-black/30 rounded-[2rem] cursor-pointer transition-opacity duration-300",
-                      !isMuted && "opacity-0 pointer-events-none"
-                    )}
-                  >
-                      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/30 backdrop-blur-sm">
-                        <VolumeX className="w-8 h-8 text-white" />
-                      </div>
-                  </div>
-                  <Script src="https://player.vimeo.com/api/player.js"></Script>
+                  {isMuted && (
+                    <div 
+                      onClick={handleToggleMute}
+                      className={cn(
+                        "absolute inset-0 flex items-center justify-center bg-black/30 rounded-[2rem] cursor-pointer transition-opacity duration-300",
+                      )}
+                    >
+                        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/30 backdrop-blur-sm">
+                          <VolumeX className="w-8 h-8 text-white" />
+                        </div>
+                    </div>
+                  )}
               </div>
           </div>
         </div>
