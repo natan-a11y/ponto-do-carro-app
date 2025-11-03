@@ -30,7 +30,9 @@ export function HowItWorksSection() {
 
   const handleToggleMute = () => {
     if (playerRef.current) {
+      // Set volume to 1 (unmute) and ensure video continues playing
       playerRef.current.setVolume(1);
+      playerRef.current.play(); // Explicitly call play to prevent pausing
       setIsMuted(false);
     }
   };
