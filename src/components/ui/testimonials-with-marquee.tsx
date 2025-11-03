@@ -44,6 +44,15 @@ export function TestimonialsSection({
                 />
               ))}
             </div>
+            {/* This is the duplicated content for seamless looping */}
+            <div className="flex shrink-0 justify-around [gap:var(--gap)] animate-marquee flex-row group-hover:[animation-play-state:paused]" aria-hidden="true">
+              {[...testimonials, ...testimonials].map((testimonial, i) => (
+                <TestimonialCard 
+                   key={i}
+                   {...testimonial}
+                />
+              ))}
+            </div>
           </div>
           
           <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-1/4 bg-gradient-to-r from-secondary sm:block" />
