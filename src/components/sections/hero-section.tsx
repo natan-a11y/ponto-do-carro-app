@@ -48,10 +48,10 @@ export function HeroSection() {
             className="mt-10 flex flex-col items-end gap-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 ease-in-out"
             style={{ animationDelay: '900ms' }}
             >
-             <Button size="lg" variant="accent" onClick={onOpen} className="rounded-full">
+             <Button size="lg" variant="accent" onClick={onOpen}>
                 Falar no WhatsApp
             </Button>
-            <Button size="lg" variant="default" onClick={onOpen} className="rounded-full">
+            <Button size="lg" variant="default" onClick={onOpen}>
                Agendar avaliação
             </Button>
           </div>

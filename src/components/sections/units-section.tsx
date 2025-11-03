@@ -47,12 +47,12 @@ export function UnitsSection() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col sm:flex-row gap-3 p-6 pt-0 mt-auto">
-                  <Button variant="outline" asChild className="w-full rounded-full">
+                  <Button variant="outline" asChild className="w-full">
                     <a href={getWhatsAppLink(unit.id, `Olá! Gostaria de agendar uma avaliação na unidade ${unit.name}.`)} target="_blank" rel="noopener noreferrer">
                       WhatsApp
                     </a>
                   </Button>
-                  <Button asChild className="w-full rounded-full" variant="accent">
+                  <Button asChild className="w-full" variant="accent">
                     <Link href={`/unidades/${unit.slug}`}>Ver detalhes</Link>
                   </Button>
                 </CardFooter>

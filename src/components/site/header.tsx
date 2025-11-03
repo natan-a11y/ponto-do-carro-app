@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/data";
 import { Logo } from "./logo";
@@ -55,10 +55,10 @@ export default function SiteHeader() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-           <Button variant="accent" onClick={onOpen} className="rounded-full">
+           <Button variant="accent" onClick={onOpen}>
             Falar no WhatsApp
           </Button>
-          <Button onClick={onOpen} className="rounded-full">
+          <Button onClick={onOpen}>
             Agendar Avaliação
           </Button>
         </div>
@@ -70,7 +70,7 @@ export default function SiteHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="right">
-             <SheetHeader className="sr-only">
+            <SheetHeader className="sr-only">
               <SheetTitle>Menu</SheetTitle>
               <SheetDescription>Navegação principal e links de contato.</SheetDescription>
             </SheetHeader>
@@ -94,10 +94,10 @@ export default function SiteHeader() {
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-4">
-                <Button variant="accent" onClick={handleMenuClick} className="rounded-full">
+                <Button variant="accent" onClick={handleMenuClick}>
                   Falar no WhatsApp
                 </Button>
-                <Button onClick={handleMenuClick} className="rounded-full">
+                <Button onClick={handleMenuClick}>
                   Agendar Avaliação
                 </Button>
               </div>
