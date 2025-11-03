@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import Script from "next/script";
 import { useContactModal } from "../site/contact-modal";
 import { VolumeX } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function HowItWorksSection() {
     const { onOpen } = useContactModal();
@@ -63,16 +64,17 @@ export function HowItWorksSection() {
                           >
                       </iframe>
                   </div>
-                  {isMuted && (
-                      <div 
-                        className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-[2rem] cursor-pointer"
-                        onClick={handleToggleMute}
-                      >
-                          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/30 backdrop-blur-sm">
-                            <VolumeX className="w-8 h-8 text-white" />
-                          </div>
+                  <div 
+                    onClick={handleToggleMute}
+                    className={cn(
+                      "absolute inset-0 flex items-center justify-center bg-black/30 rounded-[2rem] cursor-pointer transition-opacity duration-300",
+                      !isMuted && "opacity-0 pointer-events-none"
+                    )}
+                  >
+                      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/30 backdrop-blur-sm">
+                        <VolumeX className="w-8 h-8 text-white" />
                       </div>
-                  )}
+                  </div>
                   <Script src="https://player.vimeo.com/api/player.js"></Script>
               </div>
           </div>
