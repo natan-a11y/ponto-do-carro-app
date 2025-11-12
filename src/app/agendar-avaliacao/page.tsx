@@ -2,7 +2,6 @@
 
 import { AppointmentForm } from "@/components/forms/appointment-form";
 import { UNITS } from "@/lib/data";
-import { AppointmentFormProvider } from "@/components/forms/appointment-form-context";
 import { useContactModal } from "@/components/site/contact-modal";
 import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
@@ -31,9 +30,7 @@ export default function AgendarAvaliacaoPage() {
         </div>
         
         <div className="bg-card p-6 sm:p-8 rounded-xl shadow-2xl border">
-            <AppointmentFormProvider>
-              <AppointmentForm units={UNITS} />
-            </AppointmentFormProvider>
+            <AppointmentForm units={UNITS} />
         </div>
       </div>
     </div>
