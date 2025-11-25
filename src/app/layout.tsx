@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="scroll-smooth">
       <head>
-        <link rel="icon" href="https://i.postimg.cc/TP90pyMX/Ponto-do-Carro-Logo-Png-Favicon.png" type="image/png" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Inter:wght@400;700&display=swap" rel="stylesheet" />
