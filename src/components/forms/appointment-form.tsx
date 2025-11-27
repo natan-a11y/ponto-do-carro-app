@@ -173,15 +173,18 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   // Efeitos para resetar campos dependentes
   useEffect(() => {
     setSelectedBrand(null);
-  }, [vehicleType]);
+    setValue("vehicleBrand", "");
+  }, [vehicleType, setValue]);
   
   useEffect(() => {
     setSelectedModel(null);
-  }, [selectedBrand]);
+    setValue("vehicleModel", "");
+  }, [selectedBrand, setValue]);
 
   useEffect(() => {
     setSelectedYear(null);
-  }, [selectedModel]);
+    setValue("vehicleYear", "");
+  }, [selectedModel, setValue]);
   
   // Seta os valores no react-hook-form quando a seleção muda
   useEffect(() => setValue("vehicleBrand", selectedBrand?.nome || ""), [selectedBrand, setValue]);
@@ -194,11 +197,21 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     setActiveDropdown(activeDropdown === name ? null : name);
   };
 
-  const handleNextStep = () => {
-    trigger(['vehicleBrand', 'vehicleModel', 'vehicleYear']).then(isValid => {
-      if (isValid) setStep(2);
-    });
-  }
+  const handleNextStep = async () => {
+    let fieldsToValidate: (keyof FormData)[] = [];
+    let nextStep = step + 1;
+
+    if (step === 1) {
+      fieldsToValidate = ['vehicleBrand', 'vehicleModel', 'vehicleYear'];
+    } else if (step === 2) {
+      fieldsToValidate = ['name', 'phone', 'unit'];
+    }
+
+    const isValid = await trigger(fieldsToValidate);
+    if (isValid) {
+      setStep(nextStep);
+    }
+  };
   
   const handleFinalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -235,7 +248,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     <form onSubmit={handleFinalSubmit} className="space-y-6">
       
       {/* Etapa 1: Seleção de Veículo */}
-      <div className={cn(step !== 1 && 'hidden')}>
+      <div className={cn(step !== 1 && 'hidden', "animate-in fade-in-50 duration-300")}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-800">1. Selecione o seu veículo</h2>
@@ -325,135 +338,156 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
         </div>
       </div>
       
-      {/* Etapa 2: Contato e Agendamento */}
-      <div className={cn("animate-in fade-in duration-300", step !== 2 && 'hidden')}>
-          <div className="space-y-6">
+      {/* Etapa 2: Contato e Unidade */}
+      <div className={cn("space-y-6", step !== 2 && 'hidden', "animate-in fade-in-50 duration-300")}>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => setStep(1)} className="p-2 hover:bg-muted rounded-full">
+            <ArrowLeft size={16} />
+          </button>
+          <div>
+            <p className="text-sm font-semibold text-primary truncate max-w-[250px]">{selectedBrand?.nome} {selectedModel?.nome}</p>
+            <p className="text-xs text-muted-foreground">{selectedYear?.nome}</p>
+          </div>
+        </div>
+
+        <h3 className="text-lg font-semibold text-gray-800 border-t pt-4">2. Contato e Unidade</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="name">Seu nome</Label>
+            <Controller name="name" control={control} render={({ field }) => <Input id="name" {...field} />} />
+            {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="phone">Seu WhatsApp</Label>
+             <Controller name="phone" control={control} render={({ field }) => <PhoneInput field={field} />} />
+            {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
+          </div>
+        </div>
+        <div>
+            <Label htmlFor="unit">Unidade de preferência</Label>
+            <Controller
+              name="unit"
+              control={control}
+              render={({ field }) => (
+                  <div className="flex gap-2 flex-wrap pt-2">
+                      {units.map(unit => (
+                          <button
+                              type="button"
+                              key={unit.id}
+                              onClick={() => field.onChange(unit.id)}
+                              className={cn(
+                                  "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
+                                  field.value === unit.id 
+                                      ? "bg-primary text-primary-foreground border-transparent"
+                                      : "bg-transparent hover:bg-muted"
+                              )}
+                          >
+                              {unit.name.replace('Unidade ', '')}
+                          </button>
+                      ))}
+                  </div>
+              )}
+            />
+            {errors.unit && <p className="text-sm text-red-600 mt-1">{errors.unit.message}</p>}
+          </div>
+        <div className="pt-2">
+            <Button 
+                type="button" 
+                onClick={handleNextStep}
+                size="lg" 
+                className="w-full"
+              >
+              Avançar para Agendamento
+            </Button>
+          </div>
+      </div>
+
+       {/* Etapa 3: Data, Horário e Finalização */}
+       <div className={cn("space-y-6", step !== 3 && 'hidden', "animate-in fade-in-50 duration-300")}>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => setStep(1)} className="p-2 hover:bg-muted rounded-full">
+              <button type="button" onClick={() => setStep(2)} className="p-2 hover:bg-muted rounded-full">
                 <ArrowLeft size={16} />
               </button>
               <div>
-                <p className="text-sm font-semibold text-primary">{selectedBrand?.nome} {selectedModel?.nome}</p>
+                <p className="text-sm font-semibold text-primary truncate max-w-[250px]">{selectedBrand?.nome} {selectedModel?.nome}</p>
                 <p className="text-xs text-muted-foreground">{selectedYear?.nome}</p>
               </div>
             </div>
-
-            <h3 className="text-lg font-semibold text-gray-800 border-t pt-4">2. Contato e Unidade</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Seu nome</Label>
-                <Controller name="name" control={control} render={({ field }) => <Input id="name" {...field} />} />
-                {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
-              </div>
-              <div>
-                <Label htmlFor="phone">Seu WhatsApp</Label>
-                 <Controller name="phone" control={control} render={({ field }) => <PhoneInput field={field} />} />
-                {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
-              </div>
-            </div>
-            <div>
-                <Label htmlFor="unit">Unidade de preferência</Label>
-                <Controller
-                  name="unit"
-                  control={control}
-                  render={({ field }) => (
-                      <div className="flex gap-2 flex-wrap pt-2">
-                          {units.map(unit => (
-                              <button
-                                  type="button"
-                                  key={unit.id}
-                                  onClick={() => field.onChange(unit.id)}
-                                  className={cn(
-                                      "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
-                                      field.value === unit.id 
-                                          ? "bg-primary text-primary-foreground border-transparent"
-                                          : "bg-transparent hover:bg-muted"
-                                  )}
-                              >
-                                  {unit.name.replace('Unidade ', '')}
-                              </button>
-                          ))}
-                      </div>
-                  )}
-                />
-                {errors.unit && <p className="text-sm text-red-600 mt-1">{errors.unit.message}</p>}
-              </div>
-              
-              <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">3. Data e Horário</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="flex flex-col items-center">
-                <Label className="mb-2 self-start">Data de preferência</Label>
-                <Controller
-                  name="preferredDate"
-                  control={control}
-                  render={({ field }) => (
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date < new Date(new Date().toDateString())}
-                      initialFocus
-                      locale={ptBR}
-                      className="border rounded-md"
-                    />
-                  )}
-                />
-                 {errors.preferredDate && <p className="text-sm text-red-600 mt-1 self-start">{errors.preferredDate.message}</p>}
-              </div>
-              <div className="space-y-4">
-                <Label>Horário de preferência</Label>
-                <Controller
-                  name="preferredTime"
-                  control={control}
-                  render={({ field }) => (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {TIME_SLOTS.map(time => (
-                              <button
-                                  type="button"
-                                  key={time}
-                                  onClick={() => field.onChange(time)}
-                                  className={cn(
-                                      "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
-                                       field.value === time 
-                                          ? "bg-primary text-primary-foreground border-transparent"
-                                          : "bg-transparent hover:bg-muted"
-                                  )}
-                              >
-                                  {time}
-                              </button>
-                          ))}
-                      </div>
-                  )}
-                />
-                {errors.preferredTime && <p className="text-sm text-red-600 mt-1">{errors.preferredTime.message}</p>}
-              </div>
-            </div>
-            <div className="flex items-start space-x-3 pt-4">
+            
+            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">3. Data e Horário</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex flex-col items-center">
+              <Label className="mb-2 self-start">Data de preferência</Label>
               <Controller
-                name="lgpdConsent"
+                name="preferredDate"
                 control={control}
                 render={({ field }) => (
-                  <Checkbox id="lgpdConsent" onCheckedChange={field.onChange} checked={field.value} name="lgpdConsent" className="mt-1" />
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) => date < new Date(new Date().toDateString())}
+                    initialFocus
+                    locale={ptBR}
+                    className="border rounded-md"
+                  />
                 )}
               />
-              <div className="grid gap-1.5 leading-none">
-                <label htmlFor="lgpdConsent" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Concordo com os termos
-                </label>
-                <p className="text-sm text-muted-foreground">
-                  Ao agendar, você concorda em ser contatado via WhatsApp e aceita nossa política de privacidade.
-                </p>
-                {errors.lgpdConsent && <p className="text-sm text-red-600 mt-1">{errors.lgpdConsent.message}</p>}
-              </div>
+               {errors.preferredDate && <p className="text-sm text-red-600 mt-1 self-start">{errors.preferredDate.message}</p>}
             </div>
-
-            <div className="pt-4">
-              <Button type="submit" disabled={isPending} variant="accent" size="lg" className="w-full">
-                  {isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}
-              </Button>
+            <div className="space-y-4">
+              <Label>Horário de preferência</Label>
+              <Controller
+                name="preferredTime"
+                control={control}
+                render={({ field }) => (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {TIME_SLOTS.map(time => (
+                            <button
+                                type="button"
+                                key={time}
+                                onClick={() => field.onChange(time)}
+                                className={cn(
+                                    "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
+                                     field.value === time 
+                                        ? "bg-primary text-primary-foreground border-transparent"
+                                        : "bg-transparent hover:bg-muted"
+                                )}
+                            >
+                                {time}
+                            </button>
+                        ))}
+                    </div>
+                )}
+              />
+              {errors.preferredTime && <p className="text-sm text-red-600 mt-1">{errors.preferredTime.message}</p>}
             </div>
           </div>
-      </div>
+          <div className="flex items-start space-x-3 pt-4">
+            <Controller
+              name="lgpdConsent"
+              control={control}
+              render={({ field }) => (
+                <Checkbox id="lgpdConsent" onCheckedChange={field.onChange} checked={field.value} name="lgpdConsent" className="mt-1" />
+              )}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <label htmlFor="lgpdConsent" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Concordo com os termos
+              </label>
+              <p className="text-sm text-muted-foreground">
+                Ao agendar, você concorda em ser contatado via WhatsApp e aceita nossa política de privacidade.
+              </p>
+              {errors.lgpdConsent && <p className="text-sm text-red-600 mt-1">{errors.lgpdConsent.message}</p>}
+            </div>
+          </div>
+
+          <div className="pt-4">
+            <Button type="submit" disabled={isPending} variant="accent" size="lg" className="w-full">
+                {isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}
+            </Button>
+          </div>
+        </div>
 
 
        {serverState?.message && !serverState.success && (
