@@ -27,14 +27,16 @@ import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
 // FIPE API types
 type FipeData = { nome: string; codigo: string };
 
-const plateRegex = /^([A-Z]{3}-?[0-9][A-Z0-9][0-9]{2})$/;
+const plateRegex = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
 
 const formSchema = z.object({
   vehicleType: z.string().min(1, "Tipo de veículo é obrigatório"),
   vehicleBrand: z.string().min(1, "Marca é obrigatória"),
   vehicleModel: z.string().min(1, "Modelo é obrigatório"),
   vehicleYear: z.string().min(1, "Ano é obrigatório"),
-  vehiclePlate: z.string().regex(plateRegex, "Placa inválida"),
+  vehiclePlate: z.string().refine((value) => value === "" || plateRegex.test(value.replace("-", "")), {
+    message: "Placa inválida. Use o formato AAA-1234 ou ABC1D23.",
+  }).optional(),
   name: z.string().min(2, "Nome é obrigatório"),
   phone: z.string().min(15, "Telefone inválido"),
   unit: z.string().min(1, "Unidade é obrigatória"),
@@ -59,16 +61,23 @@ const PhoneInput = ({ field, ...props }: { field: any }) => {
 // Input com máscara para Placa (Padrão e Mercosul)
 const PlateInput = ({ field, ...props }: { field: any }) => {
     const { ref } = useIMask({
-        mask: IMask.Masked.Pattern,
-        pattern: '[A-Z]{3}-`[0-9]{4}`',
-        prepare: (str) => str.toUpperCase(),
-        blocks: {
-            A: {
-                mask: IMask.Masked.MaskedRegExp,
-                pattern: /[A-Z0-9]/,
-            },
+      mask: 'AAA-0*00',
+      prepare: (str) => str.toUpperCase(),
+      blocks: {
+        A: {
+          mask: IMask.Masked.RegExp,
+          pattern: /[A-Z]/,
         },
-        onAccept: (value: any) => field.onChange(value)
+        '0': {
+            mask: IMask.Masked.RegExp,
+            pattern: /[0-9]/,
+        },
+        '*': {
+            mask: IMask.Masked.RegExp,
+            pattern: /[A-Z0-9]/,
+        }
+      },
+      onAccept: (value: any) => field.onChange(value)
     });
     return <Input {...props} ref={ref} defaultValue={field.value} />;
 }
@@ -157,7 +166,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     Object.entries(finalData).forEach(([key, value]) => {
       if (value instanceof Date) {
         formData.append(key, value.toISOString());
-      } else {
+      } else if (value !== undefined && value !== null) {
         formData.append(key, String(value));
       }
     });
@@ -229,11 +238,11 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               {renderSelect("vehicleYear", "Selecione o ano", years, loadingYears, !isClient || !watchedVehicleModel, errorYears)}
             </div>
             <div className="md:col-span-2">
-              <Label htmlFor="vehiclePlate">Placa do Veículo</Label>
+              <Label htmlFor="vehiclePlate">Placa do Veículo (Opcional)</Label>
               <Controller
                 name="vehiclePlate"
                 control={control}
-                render={({ field }) => <PlateInput field={field} id="vehiclePlate" placeholder="ABC-1234 ou ABC1D23" />}
+                render={({ field }) => <PlateInput field={field} id="vehiclePlate" placeholder="ABC-1234" />}
               />
               {errors.vehiclePlate && <p className="text-sm text-red-600 mt-1">{errors.vehiclePlate.message}</p>}
             </div>
