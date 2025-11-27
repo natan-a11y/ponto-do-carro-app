@@ -1,7 +1,6 @@
-
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useState, useEffect, useTransition, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,12 +15,11 @@ import { type Unit, TIME_SLOTS } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, Loader2, AlertCircle, Car, Bike, Truck, Tag, ChevronDown, Search, X } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -45,37 +43,109 @@ type FormData = z.infer<typeof formSchema>;
 
 const FIPE_BASE_URL = 'https://parallelum.com.br/fipe/api/v1';
 
-const vehicleTypes: FipeItem[] = [
-    { nome: 'Carro', codigo: 'carros' },
-    { nome: 'Moto', codigo: 'motos' },
-    { nome: 'Caminhão', codigo: 'caminhoes' },
-];
-
 // --- Componentes Auxiliares ---
 
 const PhoneInput = React.forwardRef<HTMLInputElement, { field: any }>(({ field }, ref) => {
-    const { ref: iMaskRef } = useIMask({ 
+    const { ref: iMaskRef, setValue } = useIMask({ 
       mask: '(00) 00000-0000',
       onAccept: (value: any) => field.onChange(value)
     });
+
+    useEffect(() => {
+        if (field.value) {
+            setValue(field.value);
+        }
+    }, [field.value, setValue]);
+
     return <Input {...field} ref={iMaskRef} defaultValue={field.value} />;
 });
 PhoneInput.displayName = 'PhoneInput';
 
-const PlateInput = React.forwardRef<HTMLInputElement, { field: any }>(({ field }, ref) => {
-  const { ref: iMaskRef, setValue } = useIMask({
-    mask: 'AAA-0[A]00',
-    prepare: (str) => str.toUpperCase(),
-    onAccept: (value: any) => field.onChange(value),
-  });
+const VehicleTypeButton = ({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) => (
+  <button 
+    type="button"
+    onClick={onClick}
+    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
+      ${active 
+        ? 'bg-primary text-primary-foreground shadow-md transform scale-105' 
+        : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 border border-gray-200'
+      }
+    `}
+  >
+    {icon}
+    {label}
+  </button>
+);
+
+const SelectionFieldBlock = ({ label, value, placeholder, isOpen, onClick, disabled, icon }: { label:string, value?:string, placeholder:string, isOpen:boolean, onClick:()=>void, disabled?:boolean, icon:React.ReactNode }) => (
+  <div 
+    className={cn(`w-full flex items-center justify-between px-4 h-14 rounded-xl border transition-all relative`,
+      disabled ? 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed' : 'bg-white border-gray-200 cursor-pointer hover:border-gray-300 hover:shadow-sm',
+      isOpen ? 'ring-2 ring-ring/50 border-primary' : ''
+    )}
+    onClick={!disabled ? onClick : undefined}
+  >
+    <div className="flex items-center gap-3 overflow-hidden">
+      <div className={cn(`text-muted-foreground`, value && 'text-primary')}>{icon}</div>
+      <div className="flex flex-col items-start overflow-hidden">
+         {value && <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider leading-none mb-0.5">{label}</span>}
+         <span className={cn(`text-sm truncate max-w-[200px]`, value ? 'font-medium text-foreground' : 'text-muted-foreground')}>
+            {value || placeholder}
+         </span>
+      </div>
+    </div>
+    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+  </div>
+);
+
+const DropdownList = ({ items = [], onSelect, title, searchable, onClose }: { items: FipeItem[], onSelect: (item:FipeItem)=>void, title:string, searchable?:boolean, onClose:()=>void }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setValue(field.value || '');
-  }, [field.value, setValue]);
+    if (searchable && inputRef.current) inputRef.current.focus();
+  }, [searchable]);
 
-  return <Input {...field} ref={iMaskRef} />;
-});
-PlateInput.displayName = 'PlateInput';
+  const filteredItems = (items || []).filter(item => 
+    (item?.nome || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="absolute top-[calc(100%+8px)] left-0 w-full max-h-[320px] bg-card rounded-xl shadow-2xl border border-border p-4 z-50 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        <button onClick={onClose} className="p-1 hover:bg-muted rounded-full text-muted-foreground"><X size={16} /></button>
+      </div>
+      
+      {searchable && (
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Buscar..."
+            className="w-full pl-9 pr-4 py-2 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      )}
+
+      <div className="flex-1 overflow-y-auto space-y-1 scrollbar-hide">
+        {filteredItems.length > 0 ? (
+          filteredItems.map((item) => (
+            <div key={item?.codigo || Math.random()} className="p-2.5 hover:bg-muted rounded-lg cursor-pointer text-sm text-muted-foreground flex justify-between items-center group" onClick={() => onSelect(item)}>
+              <span>{item?.nome || 'Item'}</span>
+              <span className="opacity-0 group-hover:opacity-100 text-xs text-muted-foreground">Selecionar</span>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-8 text-muted-foreground text-sm">Nenhum resultado.</div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 
 // --- Componente Principal do Formulário ---
@@ -97,42 +167,34 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   const [years, setYears] = useState<FipeItem[]>([]);
   
   // Estados de UI da FIPE
-  const [fipeLoading, setFipeLoading] = useState<string | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [fipeLoading, setFipeLoading] = useState<boolean>(false);
   const [fipeError, setFipeError] = useState<string | null>(null);
 
-  const { register, control, trigger, getValues, setValue, formState: { errors, isValid } } = useForm<FormData>({
+  const { register, control, trigger, getValues, setValue, watch, formState: { errors, isValid } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
-    defaultValues: {
-      name: "",
-      phone: "",
-      vehiclePlate: "",
-      unit: "",
-      preferredTime: "",
-      lgpdConsent: false,
-    },
   });
+  
+  const unitValue = watch("unit");
 
   // 1. Buscar Marcas
   useEffect(() => {
     const fetchBrands = async () => {
-        setFipeLoading('brands');
+        setFipeLoading(true);
         setFipeError(null);
-        setBrands([]);
-        setModels([]);
-        setYears([]);
-        setSelectedBrand(null);
-        setSelectedModel(null);
-        setSelectedYear(null);
-        
         try {
             const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas`);
             const data = await response.json();
-            setBrands(data);
+            setBrands(Array.isArray(data) ? data : []);
+            setSelectedBrand(null);
+            setSelectedModel(null);
+            setSelectedYear(null);
         } catch (err) {
+            setBrands([]);
             setFipeError("Erro ao carregar marcas.");
         } finally {
-            setFipeLoading(null);
+            setFipeLoading(false);
         }
     };
     fetchBrands();
@@ -140,27 +202,25 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
   // 2. Buscar Modelos
   useEffect(() => {
-    if (!selectedBrand) return;
-    const fetchModels = async () => {
-        setFipeLoading('models');
-        setFipeError(null);
+    if (!selectedBrand) {
         setModels([]);
-        setYears([]);
         setSelectedModel(null);
-        setSelectedYear(null);
+        return;
+    };
+    const fetchModels = async () => {
+        setFipeLoading(true);
+        setFipeError(null);
         try {
             const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas/${selectedBrand.codigo}/modelos`);
             const data = await response.json();
-            // A API de modelos retorna { modelos: [], anos: [] }, então pegamos apenas modelos.
-            if (data.modelos) {
-              setModels(data.modelos);
-            } else {
-              setModels(data);
-            }
+            setModels(data.modelos || []);
+            setSelectedModel(null);
+            setSelectedYear(null);
         } catch (err) {
+            setModels([]);
             setFipeError("Erro ao carregar modelos.");
         } finally {
-            setFipeLoading(null);
+            setFipeLoading(false);
         }
     };
     fetchModels();
@@ -168,32 +228,41 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   
   // 3. Buscar Anos
   useEffect(() => {
-    if (!selectedModel) return;
+    if (!selectedModel || !selectedBrand) {
+      setYears([]);
+      setSelectedYear(null);
+      return;
+    };
     const fetchYears = async () => {
-        setFipeLoading('years');
+        setFipeLoading(true);
         setFipeError(null);
-        setYears([]);
-        setSelectedYear(null);
         try {
             const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas/${selectedBrand!.codigo}/modelos/${selectedModel.codigo}/anos`);
             const data = await response.json();
-            setYears(data);
+            setYears(Array.isArray(data) ? data : []);
+            setSelectedYear(null);
         } catch (err) {
+            setYears([]);
             setFipeError("Erro ao carregar anos.");
         } finally {
-            setFipeLoading(null);
+            setFipeLoading(false);
         }
     };
     fetchYears();
   }, [selectedModel, selectedBrand, vehicleType]);
-
+  
+  const toggleDropdown = (name: string) => {
+    if (name === 'model' && !selectedBrand) return;
+    if (name === 'year' && !selectedModel) return;
+    setActiveDropdown(activeDropdown === name ? null : name);
+  };
 
   const nextStep = async () => {
     let isValidStep = false;
     if (step === 1) {
         isValidStep = !!(vehicleType && selectedBrand && selectedModel && selectedYear);
     } else if (step === 2) {
-        isValidStep = await trigger(["name", "phone", "unit", "vehiclePlate"]);
+        isValidStep = await trigger(["name", "phone", "unit"]);
     }
     
     if (isValidStep) {
@@ -203,26 +272,32 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
   const prevStep = () => setStep(s => s - 1);
 
-  const onSubmit = (data: FormData) => {
-    const formData = new FormData();
-    
-    const finalData = { 
-      ...data,
-      vehicleType,
-      vehicleBrand: selectedBrand?.nome || '',
-      vehicleModel: selectedModel?.nome || '',
-      vehicleYear: selectedYear?.nome || '',
-    };
-    
-    Object.entries(finalData).forEach(([key, value]) => {
-      if (value instanceof Date) {
-        formData.append(key, value.toISOString());
-      } else if (value !== undefined && value !== null) {
-        formData.append(key, String(value));
+  const handleFinalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    trigger().then(isFormValid => {
+      if (isFormValid) {
+        const formData = new FormData();
+        const values = getValues();
+        
+        const finalData = { 
+          ...values,
+          vehicleType,
+          vehicleBrand: selectedBrand?.nome || '',
+          vehicleModel: selectedModel?.nome || '',
+          vehicleYear: selectedYear?.nome || '',
+        };
+        
+        Object.entries(finalData).forEach(([key, value]) => {
+          if (value instanceof Date) {
+            formData.append(key, value.toISOString());
+          } else if (value !== undefined && value !== null) {
+            formData.append(key, String(value));
+          }
+        });
+        
+        startTransition(() => { formAction(formData); });
       }
     });
-    
-    startTransition(() => { formAction(formData); });
   };
   
   if (serverState?.success) {
@@ -234,7 +309,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
         <CheckCircle className="h-5 w-5 text-green-600" />
         <AlertTitle className="font-bold text-lg">Agendamento Recebido!</AlertTitle>
         <AlertDescription>
-          <p className="mb-4">Obrigado, <strong>{contactValues.name}</strong>! Recebemos sua solicitação para o dia <strong>{format(contactValues.preferredDate, "dd/MM/yyyy")}</strong> às <strong>{contactValues.preferredTime}</strong> na <strong>{selectedUnitData?.name}</strong>. Entraremos em contato em breve para confirmar.</p>
+          <p className="mb-4">Obrigado, <strong>{contactValues.name}</strong>! Recebemos sua solicitação para o dia <strong>{contactValues.preferredDate ? format(contactValues.preferredDate, "dd/MM/yyyy") : ''}</strong> às <strong>{contactValues.preferredTime}</strong> na <strong>{selectedUnitData?.name}</strong>. Entraremos em contato em breve para confirmar.</p>
           <Button asChild>
             <Link href="/">Voltar para o início</Link>
           </Button>
@@ -243,54 +318,88 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     );
   }
 
-  const renderSelect = (
-      label: string,
-      placeholder: string, 
-      items: FipeItem[], 
-      selectedValue: FipeItem | null,
-      onSelect: (item: FipeItem | null) => void,
-      isLoading: boolean, 
-      isDisabled: boolean,
-    ) => (
-    <div>
-      <Label>{label}</Label>
-      <Select 
-          onValueChange={(code) => onSelect(items.find(item => item.codigo === code) || null)}
-          value={selectedValue?.codigo || ""}
-          disabled={isDisabled || isLoading}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder={isLoading ? 'Carregando...' : placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          {items.map(item => <SelectItem key={item.codigo} value={item.codigo}>{item.nome}</SelectItem>)}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-
   return (
-    <form onSubmit={(e) => { e.preventDefault(); if(isValid) onSubmit(getValues()); }} className="space-y-8">
+    <form onSubmit={handleFinalSubmit} className="space-y-8">
       <Progress value={(step / 3) * 100} className="mb-8" />
       
       {step === 1 && (
         <div className="space-y-6 animate-in fade-in-50">
           <h3 className="text-2xl font-semibold font-headline">1. Dados do Veículo</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-            <div>
-              <Label>Tipo de Veículo</Label>
-              <Select onValueChange={(value) => {
-                setVehicleType(value);
-              }} value={vehicleType}>
-                <SelectTrigger><SelectValue placeholder="Selecione o tipo"/></SelectTrigger>
-                <SelectContent>
-                    {vehicleTypes.map(type => <SelectItem key={type.codigo} value={type.codigo}>{type.nome}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            {renderSelect("Marca", "Selecione a marca", brands, selectedBrand, setSelectedBrand, fipeLoading === 'brands', !vehicleType)}
-            {renderSelect("Modelo", "Selecione o modelo", models, selectedModel, setSelectedModel, fipeLoading === 'models', !selectedBrand)}
-            {renderSelect("Ano", "Selecione o ano", years, selectedYear, setSelectedYear, fipeLoading === 'years', !selectedModel)}
+          <div className="flex gap-2 self-start">
+              <VehicleTypeButton 
+                active={vehicleType === 'carros'} 
+                onClick={() => setVehicleType('carros')} 
+                icon={<Car size={16} />} 
+                label="Carros" 
+              />
+              <VehicleTypeButton 
+                active={vehicleType === 'motos'} 
+                onClick={() => setVehicleType('motos')} 
+                icon={<Bike size={16} />} 
+                label="Motos" 
+              />
+              <VehicleTypeButton 
+                active={vehicleType === 'caminhoes'} 
+                onClick={() => setVehicleType('caminhoes')} 
+                icon={<Truck size={16} />} 
+                label="Caminhões" 
+              />
+          </div>
+
+          <div className="flex flex-col gap-4 relative">
+             <SelectionFieldBlock 
+                label="Marca"
+                value={selectedBrand?.nome}
+                placeholder="Selecione a marca"
+                isOpen={activeDropdown === 'brand'}
+                onClick={() => toggleDropdown('brand')}
+                icon={<Tag size={18} />}
+              />
+              <SelectionFieldBlock 
+                label="Modelo"
+                value={selectedModel?.nome}
+                placeholder="Selecione o modelo"
+                isOpen={activeDropdown === 'model'}
+                onClick={() => toggleDropdown('model')}
+                disabled={!selectedBrand || models.length === 0}
+                icon={<Car size={18} />}
+              />
+              <SelectionFieldBlock 
+                label="Ano"
+                value={selectedYear?.nome}
+                placeholder="Selecione o ano"
+                isOpen={activeDropdown === 'year'}
+                onClick={() => toggleDropdown('year')}
+                disabled={!selectedModel || years.length === 0}
+                icon={<Calendar size={18} />}
+              />
+
+              {activeDropdown === 'brand' && (
+                <DropdownList 
+                  items={brands} 
+                  onSelect={(item) => { setSelectedBrand(item); toggleDropdown('model'); }} 
+                  title="Selecione a Marca"
+                  searchable
+                  onClose={() => setActiveDropdown(null)}
+                />
+              )}
+              {activeDropdown === 'model' && (
+                <DropdownList 
+                  items={models} 
+                  onSelect={(item) => { setSelectedModel(item); toggleDropdown('year'); }} 
+                  title="Selecione o Modelo"
+                  searchable
+                  onClose={() => setActiveDropdown(null)}
+                />
+              )}
+              {activeDropdown === 'year' && (
+                <DropdownList 
+                  items={years} 
+                  onSelect={(item) => { setSelectedYear(item); setActiveDropdown(null); }} 
+                  title="Selecione o Ano"
+                  onClose={() => setActiveDropdown(null)}
+                />
+              )}
           </div>
           {fipeError && <p className="text-sm text-red-600 mt-2">{fipeError}</p>}
         </div>
@@ -315,33 +424,33 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+          <div>
               <Label htmlFor="unit">Unidade de preferência</Label>
               <Controller
                 name="unit"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger id="unit"><SelectValue placeholder="Selecione a unidade" /></SelectTrigger>
-                    <SelectContent>
-                      {units.map(unit => <SelectItem key={unit.id} value={unit.id}>{unit.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                    <div className="flex gap-2 flex-wrap">
+                        {units.map(unit => (
+                            <button
+                                type="button"
+                                key={unit.id}
+                                onClick={() => field.onChange(unit.id)}
+                                className={cn(
+                                    "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
+                                    field.value === unit.id 
+                                        ? "bg-primary text-primary-foreground border-transparent"
+                                        : "bg-transparent hover:bg-muted"
+                                )}
+                            >
+                                {unit.name.replace('Unidade ', '')}
+                            </button>
+                        ))}
+                    </div>
                 )}
               />
               {errors.unit && <p className="text-sm text-red-600 mt-1">{errors.unit.message}</p>}
             </div>
-            <div>
-                <Label htmlFor="vehiclePlate">Placa (Opcional)</Label>
-                <Controller
-                  name="vehiclePlate"
-                  control={control}
-                  render={({ field }) => <PlateInput field={field} />}
-                />
-                {errors.vehiclePlate && <p className="text-sm text-red-600 mt-1">{errors.vehiclePlate.message}</p>}
-            </div>
-          </div>
         </div>
       )}
 
@@ -374,12 +483,23 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
                 name="preferredTime"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger><SelectValue placeholder="Selecione o horário" /></SelectTrigger>
-                    <SelectContent>
-                      {TIME_SLOTS.map(time => <SelectItem key={time} value={time}>{time}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                    <div className="grid grid-cols-3 gap-2">
+                        {TIME_SLOTS.map(time => (
+                            <button
+                                type="button"
+                                key={time}
+                                onClick={() => field.onChange(time)}
+                                className={cn(
+                                    "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
+                                     field.value === time 
+                                        ? "bg-primary text-primary-foreground border-transparent"
+                                        : "bg-transparent hover:bg-muted"
+                                )}
+                            >
+                                {time}
+                            </button>
+                        ))}
+                    </div>
                 )}
               />
               {errors.preferredTime && <p className="text-sm text-red-600 mt-1">{errors.preferredTime.message}</p>}
@@ -409,7 +529,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
       <div className={cn("flex pt-4", step > 1 ? "justify-between" : "justify-end")}>
         {step > 1 && <Button type="button" variant="outline" onClick={prevStep}>Anterior</Button>}
         
-        {step < 3 && <Button type="button" onClick={nextStep} variant="accent">Próximo</Button>}
+        {step < 3 && <Button type="button" onClick={nextStep} variant="accent" disabled={!selectedYear}>Próximo</Button>}
         
         {step === 3 && (
             <Button type="submit" disabled={isPending || !isValid} variant="accent">
@@ -428,5 +548,3 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </form>
   );
 }
-
-    
