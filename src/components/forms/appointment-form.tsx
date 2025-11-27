@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -180,18 +180,14 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   const prevStep = () => setStep(s => s - 1);
 
   const onSubmit = (data: FormData) => {
-    if (!selectedBrand || !selectedModel || !selectedYear) {
-      // Segurança extra, mas o botão de submit deve estar desabilitado
-      return;
-    }
     const formData = new FormData();
     
     const finalData = { 
       ...data,
       vehicleType,
-      vehicleBrand: selectedBrand.nome,
-      vehicleModel: selectedModel.nome,
-      vehicleYear: selectedYear.nome,
+      vehicleBrand: selectedBrand?.nome || '',
+      vehicleModel: selectedModel?.nome || '',
+      vehicleYear: selectedYear?.nome || '',
     };
     
     Object.entries(finalData).forEach(([key, value]) => {
@@ -246,7 +242,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   );
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(onSubmit)(); }} className="space-y-8">
+    <form onSubmit={(e) => { e.preventDefault(); onSubmit(getValues()); }} className="space-y-8">
       <Progress value={(step / 3) * 100} className="mb-8" />
       
       {step === 1 && (
