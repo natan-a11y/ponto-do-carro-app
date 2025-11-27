@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useTransition, useActionState, useEffect, useRef } from "react";
+import { useState, useTransition, useEffect } from "react";
+import { useFormState } from "react-dom";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useIMask } from "react-imask";
+import { useIMask, IMask } from "react-imask";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,23 +18,23 @@ import { scheduleAppointment } from "@/app/actions";
 import { type Unit, TIME_SLOTS } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { CheckCircle, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { ptBR } from 'date-fns/locale';
+import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
 
 // FIPE API types
-type VehicleType = { nome: string; codigo: string };
-type Brand = { nome: string; codigo: string };
-type Model = { nome: string; codigo: string };
-type Year = { nome: string; codigo: string };
+type FipeData = { nome: string; codigo: string };
 
+const plateRegex = /^([A-Z]{3}-?[0-9][A-Z0-9][0-9]{2})$/;
 
 const formSchema = z.object({
   vehicleType: z.string().min(1, "Tipo de veículo é obrigatório"),
   vehicleBrand: z.string().min(1, "Marca é obrigatória"),
   vehicleModel: z.string().min(1, "Modelo é obrigatório"),
   vehicleYear: z.string().min(1, "Ano é obrigatório"),
+  vehiclePlate: z.string().regex(plateRegex, "Placa inválida"),
   name: z.string().min(2, "Nome é obrigatório"),
   phone: z.string().min(15, "Telefone inválido"),
   unit: z.string().min(1, "Unidade é obrigatória"),
@@ -46,42 +47,48 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+// Input com máscara para Telefone
 const PhoneInput = ({ field, ...props }: { field: any }) => {
-    const { ref, maskRef } = useIMask({
+    const { ref } = useIMask({ 
       mask: '(00) 00000-0000',
+      onAccept: (value: any) => field.onChange(value)
     });
-  
-    useEffect(() => {
-        if(field.onChange && maskRef.current) {
-            const mask = maskRef.current;
-            const listener = () => field.onChange(mask.value);
-            mask.on('accept', listener);
-            return () => {
-                mask.off('accept', listener);
-            }
-        }
-    }, [field, maskRef]);
-
     return <Input {...props} ref={ref} defaultValue={field.value} />;
-  };
+};
+
+// Input com máscara para Placa (Padrão e Mercosul)
+const PlateInput = ({ field, ...props }: { field: any }) => {
+    const { ref } = useIMask({
+        mask: IMask.Masked.Pattern,
+        pattern: '[A-Z]{3}-`[0-9]{4}`',
+        prepare: (str) => str.toUpperCase(),
+        blocks: {
+            A: {
+                mask: IMask.Masked.MaskedRegExp,
+                pattern: /[A-Z0-9]/,
+            },
+        },
+        onAccept: (value: any) => field.onChange(value)
+    });
+    return <Input {...props} ref={ref} defaultValue={field.value} />;
+}
+
 
 export function AppointmentForm({ units }: { units: Unit[] }) {
   const [step, setStep] = useState(1);
   const [isPending, startTransition] = useTransition();
-  const [state, formAction] = useActionState(scheduleAppointment, { message: null });
+  const [state, formAction] = useFormState(scheduleAppointment, { message: null });
+  const [isClient, setIsClient] = useState(false);
 
-  // FIPE API State
-  const [vehicleTypes] = useState<VehicleType[]>([
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const vehicleTypes: FipeData[] = [
       { nome: 'Carro', codigo: 'carros' },
       { nome: 'Moto', codigo: 'motos' },
       { nome: 'Caminhão', codigo: 'caminhoes' },
-  ]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [models, setModels] = useState<Model[]>([]);
-  const [years, setYears] = useState<Year[]>([]);
-  const [loading, setLoading] = useState({ brands: false, models: false, years: false });
-  const [selectedBrandName, setSelectedBrandName] = useState('');
-  const [selectedModelName, setSelectedModelName] = useState('');
+  ];
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -91,6 +98,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
       vehicleBrand: '',
       vehicleModel: '',
       vehicleYear: '',
+      vehiclePlate: '',
     },
   });
 
@@ -99,74 +107,31 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   const watchedVehicleType = useWatch({ control, name: 'vehicleType' });
   const watchedVehicleBrand = useWatch({ control, name: 'vehicleBrand' });
   const watchedVehicleModel = useWatch({ control, name: 'vehicleModel' });
+  
+  const { data: brands, loading: loadingBrands, error: errorBrands } = useFipeBrands(watchedVehicleType);
+  const { data: models, loading: loadingModels, error: errorModels } = useFipeModels(watchedVehicleType, watchedVehicleBrand);
+  const { data: years, loading: loadingYears, error: errorYears } = useFipeYears(watchedVehicleType, watchedVehicleBrand, watchedVehicleModel);
 
-
+  // Limpa os campos dependentes quando a seleção principal muda
   useEffect(() => {
-    if (watchedVehicleType) {
-      setLoading(l => ({ ...l, brands: true }));
-      setBrands([]);
-      setModels([]);
-      setYears([]);
+      if (!isClient) return;
       setValue('vehicleBrand', '');
       setValue('vehicleModel', '');
       setValue('vehicleYear', '');
-
-      fetch(`https://brasilapi.com.br/api/fipe/marcas/v1/${watchedVehicleType}`)
-        .then(res => res.json())
-        .then(data => {
-            setBrands(data);
-            setLoading(l => ({ ...l, brands: false }));
-        })
-        .catch(() => setLoading(l => ({ ...l, brands: false })));
-    }
-  }, [watchedVehicleType, setValue]);
+  }, [watchedVehicleType, setValue, isClient]);
 
   useEffect(() => {
-    if (watchedVehicleBrand && watchedVehicleType) {
-      setLoading(l => ({ ...l, models: true }));
-      setModels([]);
-      setYears([]);
+      if (!isClient) return;
       setValue('vehicleModel', '');
       setValue('vehicleYear', '');
-
-      const brand = brands.find(b => b.codigo === watchedVehicleBrand);
-      if (brand) setSelectedBrandName(brand.nome);
-
-      fetch(`https://brasilapi.com.br/api/fipe/v1/${watchedVehicleType}/${watchedVehicleBrand}`)
-        .then(res => res.json())
-        .then(data => {
-            setModels(data);
-            setLoading(l => ({ ...l, models: false }));
-        })
-        .catch(() => setLoading(l => ({ ...l, models: false })));
-    }
-  }, [watchedVehicleBrand, watchedVehicleType, brands, setValue]);
-
-  useEffect(() => {
-    if (watchedVehicleModel && watchedVehicleBrand && watchedVehicleType) {
-      setLoading(l => ({ ...l, years: true }));
-      setYears([]);
-      setValue('vehicleYear', '');
-
-      const model = models.find(m => m.codigo === watchedVehicleModel);
-      if (model) setSelectedModelName(model.nome);
-
-      fetch(`https://brasilapi.com.br/api/fipe/v1/${watchedVehicleType}/${watchedVehicleBrand}/${watchedVehicleModel}`)
-        .then(res => res.json())
-        .then(data => {
-            setYears(data);
-            setLoading(l => ({ ...l, years: false }));
-        })
-        .catch(() => setLoading(l => ({ ...l, years: false })));
-    }
-  }, [watchedVehicleModel, watchedVehicleBrand, watchedVehicleType, models, setValue]);
+  }, [watchedVehicleBrand, setValue, isClient]);
 
 
   const nextStep = async () => {
-    let fields: (keyof FormData)[] = [];
-    if (step === 1) fields = ["vehicleType", "vehicleBrand", "vehicleModel", "vehicleYear"];
-    if (step === 2) fields = ["name", "phone", "unit"];
-
+    const fields: (keyof FormData)[] = step === 1
+      ? ["vehicleType", "vehicleBrand", "vehicleModel", "vehicleYear", "vehiclePlate"]
+      : ["name", "phone", "unit"];
+    
     const isValid = await trigger(fields);
     if (isValid) setStep(s => s + 1);
   };
@@ -175,24 +140,29 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
   const onSubmit = (data: FormData) => {
     const formData = new FormData();
-    const finalData = {
-        ...data,
-        vehicleBrand: selectedBrandName,
-        vehicleModel: selectedModelName,
-        vehicleYear: years.find(y => y.codigo === data.vehicleYear)?.nome || data.vehicleYear,
+    
+    const brandName = brands.find(b => b.codigo === data.vehicleBrand)?.nome || '';
+    const modelName = models.find(m => m.codigo === data.vehicleModel)?.nome || '';
+    const yearData = years.find(y => y.codigo === data.vehicleYear);
+
+    const finalData = { 
+      ...data, 
+      vehicleBrandName: brandName, 
+      vehicleModelName: modelName,
+      vehicleYearName: yearData?.nome || '',
+      codigoFipe: data.vehicleModel, // O código do modelo é o código FIPE
+      anoModelo: data.vehicleYear, // O código do ano é o ano/combustível
     };
 
     Object.entries(finalData).forEach(([key, value]) => {
-      if (key === 'preferredDate' && value instanceof Date) {
+      if (value instanceof Date) {
         formData.append(key, value.toISOString());
       } else {
         formData.append(key, String(value));
       }
     });
     
-    startTransition(() => {
-      formAction(formData);
-    });
+    startTransition(() => { formAction(formData); });
   };
   
   if (state?.success) {
@@ -213,25 +183,26 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     );
   }
 
-  const renderSelect = (name: keyof FormData, placeholder: string, items: {codigo: string, nome: string}[], isLoading: boolean, isDisabled: boolean) => (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => (
-        <Select onValueChange={field.onChange} value={field.value} disabled={isDisabled || isLoading}>
-          <SelectTrigger>
-            <SelectValue placeholder={isLoading ? 'Carregando...' : placeholder} />
-          </SelectTrigger>
-          <SelectContent>
-            {items.map(item => (
-              <SelectItem key={item.codigo} value={item.codigo}>{item.nome}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-    />
+  const renderSelect = (name: keyof FormData, placeholder: string, items: FipeData[], isLoading: boolean, isDisabled: boolean, error?: string | null) => (
+    <div>
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Select onValueChange={field.onChange} value={field.value} disabled={isDisabled || isLoading}>
+            <SelectTrigger>
+              <SelectValue placeholder={isLoading ? 'Carregando...' : placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              {items.map(item => <SelectItem key={item.codigo} value={item.codigo}>{item.nome}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        )}
+      />
+      {errors[name] && <p className="text-sm text-red-600 mt-1">{(errors[name] as any).message}</p>}
+      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+    </div>
   );
-
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -240,26 +211,31 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
       {step === 1 && (
         <div className="space-y-6 animate-in fade-in-50">
           <h3 className="text-2xl font-semibold font-headline">1. Dados do Veículo</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <div>
               <Label>Tipo de Veículo</Label>
-              {renderSelect("vehicleType", "Selecione o tipo", vehicleTypes, false, false)}
-              {errors.vehicleType && <p className="text-sm text-red-600 mt-1">{errors.vehicleType.message}</p>}
+              {renderSelect("vehicleType", "Selecione o tipo", vehicleTypes, false, !isClient)}
             </div>
             <div>
               <Label>Marca</Label>
-              {renderSelect("vehicleBrand", "Selecione a marca", brands, loading.brands, !watchedVehicleType)}
-              {errors.vehicleBrand && <p className="text-sm text-red-600 mt-1">{errors.vehicleBrand.message}</p>}
+              {renderSelect("vehicleBrand", "Selecione a marca", brands, loadingBrands, !isClient || !watchedVehicleType, errorBrands)}
             </div>
             <div>
               <Label>Modelo</Label>
-              {renderSelect("vehicleModel", "Selecione o modelo", models, loading.models, !watchedVehicleBrand)}
-              {errors.vehicleModel && <p className="text-sm text-red-600 mt-1">{errors.vehicleModel.message}</p>}
+              {renderSelect("vehicleModel", "Selecione o modelo", models, loadingModels, !isClient || !watchedVehicleBrand, errorModels)}
             </div>
             <div>
               <Label>Ano</Label>
-              {renderSelect("vehicleYear", "Selecione o ano", years, loading.years, !watchedVehicleModel)}
-              {errors.vehicleYear && <p className="text-sm text-red-600 mt-1">{errors.vehicleYear.message}</p>}
+              {renderSelect("vehicleYear", "Selecione o ano", years, loadingYears, !isClient || !watchedVehicleModel, errorYears)}
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="vehiclePlate">Placa do Veículo</Label>
+              <Controller
+                name="vehiclePlate"
+                control={control}
+                render={({ field }) => <PlateInput field={field} id="vehiclePlate" placeholder="ABC-1234 ou ABC1D23" />}
+              />
+              {errors.vehiclePlate && <p className="text-sm text-red-600 mt-1">{errors.vehiclePlate.message}</p>}
             </div>
           </div>
         </div>
@@ -291,13 +267,9 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               control={control}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger id="unit">
-                    <SelectValue placeholder="Selecione a unidade" />
-                  </SelectTrigger>
+                  <SelectTrigger id="unit"><SelectValue placeholder="Selecione a unidade" /></SelectTrigger>
                   <SelectContent>
-                    {units.map(unit => (
-                      <SelectItem key={unit.id} value={unit.id}>{unit.name}</SelectItem>
-                    ))}
+                    {units.map(unit => <SelectItem key={unit.id} value={unit.id}>{unit.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               )}
@@ -337,13 +309,9 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
                 control={control}
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o horário" />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Selecione o horário" /></SelectTrigger>
                     <SelectContent>
-                      {TIME_SLOTS.map(time => (
-                        <SelectItem key={time} value={time}>{time}</SelectItem>
-                      ))}
+                      {TIME_SLOTS.map(time => <SelectItem key={time} value={time}>{time}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 )}
@@ -356,12 +324,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               name="lgpdConsent"
               control={control}
               render={({ field }) => (
-                <Checkbox
-                  id="lgpdConsent"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  className="mt-1"
-                />
+                <Checkbox id="lgpdConsent" checked={field.value} onCheckedChange={field.onChange} className="mt-1" />
               )}
             />
             <div className="grid gap-1.5 leading-none">
@@ -378,26 +341,15 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
       )}
 
       <div className={cn("flex pt-4", step > 1 ? "justify-between" : "justify-end")}>
-        {step > 1 && (
-          <Button type="button" variant="outline" onClick={prevStep}>
-            Anterior
-          </Button>
-        )}
-        {step < 3 && (
-          <Button type="button" onClick={nextStep} variant="accent">
-            Próximo
-          </Button>
-        )}
-        {step === 3 && (
-          <Button type="submit" disabled={isPending} variant="accent">
-            {isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}
-          </Button>
-        )}
+        {step > 1 && <Button type="button" variant="outline" onClick={prevStep}>Anterior</Button>}
+        {step < 3 && <Button type="button" onClick={nextStep} variant="accent">Próximo</Button>}
+        {step === 3 && <Button type="submit" disabled={isPending} variant="accent">{isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}</Button>}
       </div>
 
        {state?.message && !state.success && (
-        <Alert variant="destructive">
-          <AlertTitle>Erro</AlertTitle>
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erro no Agendamento</AlertTitle>
           <AlertDescription>{state.message}</AlertDescription>
         </Alert>
       )}
