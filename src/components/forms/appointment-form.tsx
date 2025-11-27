@@ -32,6 +32,7 @@ type FipeItem = { nome: string; codigo: string };
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
   phone: z.string().min(15, "Telefone inválido"),
+  vehiclePlate: z.string().optional(),
   unit: z.string().min(1, "Unidade é obrigatória"),
   preferredDate: z.date({ required_error: "Data é obrigatória" }),
   preferredTime: z.string().min(1, "Horário é obrigatório"),
@@ -61,6 +62,22 @@ const PhoneInput = React.forwardRef<HTMLInputElement, { field: any }>(({ field }
 });
 PhoneInput.displayName = 'PhoneInput';
 
+const PlateInput = React.forwardRef<HTMLInputElement, { field: any }>(({ field }, ref) => {
+  const { ref: iMaskRef, setValue } = useIMask({
+    mask: 'AAA-0[A]00',
+    prepare: (str) => str.toUpperCase(),
+    onAccept: (value: any) => field.onChange(value),
+  });
+
+  useEffect(() => {
+    setValue(field.value || '');
+  }, [field.value, setValue]);
+
+  return <Input {...field} ref={iMaskRef} />;
+});
+PlateInput.displayName = 'PlateInput';
+
+
 // --- Componente Principal do Formulário ---
 
 export function AppointmentForm({ units }: { units: Unit[] }) {
@@ -83,12 +100,13 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   const [fipeLoading, setFipeLoading] = useState<string | null>(null);
   const [fipeError, setFipeError] = useState<string | null>(null);
 
-  const { register, control, trigger, getValues, formState: { errors, isValid } } = useForm<FormData>({
+  const { register, control, trigger, getValues, setValue, formState: { errors, isValid } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: {
       name: "",
       phone: "",
+      vehiclePlate: "",
       unit: "",
       preferredTime: "",
       lgpdConsent: false,
@@ -100,12 +118,13 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     const fetchBrands = async () => {
         setFipeLoading('brands');
         setFipeError(null);
-        // Reset
+        setBrands([]);
+        setModels([]);
+        setYears([]);
         setSelectedBrand(null);
         setSelectedModel(null);
         setSelectedYear(null);
-        setModels([]);
-        setYears([]);
+        
         try {
             const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas`);
             const data = await response.json();
@@ -125,14 +144,19 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     const fetchModels = async () => {
         setFipeLoading('models');
         setFipeError(null);
-        // Reset
+        setModels([]);
+        setYears([]);
         setSelectedModel(null);
         setSelectedYear(null);
-        setYears([]);
         try {
             const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas/${selectedBrand.codigo}/modelos`);
             const data = await response.json();
-            setModels(data.modelos);
+            // A API de modelos retorna { modelos: [], anos: [] }, então pegamos apenas modelos.
+            if (data.modelos) {
+              setModels(data.modelos);
+            } else {
+              setModels(data);
+            }
         } catch (err) {
             setFipeError("Erro ao carregar modelos.");
         } finally {
@@ -148,7 +172,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     const fetchYears = async () => {
         setFipeLoading('years');
         setFipeError(null);
-        // Reset
+        setYears([]);
         setSelectedYear(null);
         try {
             const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas/${selectedBrand!.codigo}/modelos/${selectedModel.codigo}/anos`);
@@ -169,7 +193,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     if (step === 1) {
         isValidStep = !!(vehicleType && selectedBrand && selectedModel && selectedYear);
     } else if (step === 2) {
-        isValidStep = await trigger(["name", "phone", "unit"]);
+        isValidStep = await trigger(["name", "phone", "unit", "vehiclePlate"]);
     }
     
     if (isValidStep) {
@@ -220,6 +244,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   }
 
   const renderSelect = (
+      label: string,
       placeholder: string, 
       items: FipeItem[], 
       selectedValue: FipeItem | null,
@@ -227,22 +252,25 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
       isLoading: boolean, 
       isDisabled: boolean,
     ) => (
-    <Select 
-        onValueChange={(code) => onSelect(items.find(item => item.codigo === code) || null)}
-        value={selectedValue?.codigo || ""}
-        disabled={isDisabled || isLoading}
-    >
-      <SelectTrigger>
-        <SelectValue placeholder={isLoading ? 'Carregando...' : placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        {items.map(item => <SelectItem key={item.codigo} value={item.codigo}>{item.nome}</SelectItem>)}
-      </SelectContent>
-    </Select>
+    <div>
+      <Label>{label}</Label>
+      <Select 
+          onValueChange={(code) => onSelect(items.find(item => item.codigo === code) || null)}
+          value={selectedValue?.codigo || ""}
+          disabled={isDisabled || isLoading}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder={isLoading ? 'Carregando...' : placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {items.map(item => <SelectItem key={item.codigo} value={item.codigo}>{item.nome}</SelectItem>)}
+        </SelectContent>
+      </Select>
+    </div>
   );
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(getValues()); }} className="space-y-8">
+    <form onSubmit={(e) => { e.preventDefault(); if(isValid) onSubmit(getValues()); }} className="space-y-8">
       <Progress value={(step / 3) * 100} className="mb-8" />
       
       {step === 1 && (
@@ -251,25 +279,18 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <div>
               <Label>Tipo de Veículo</Label>
-              <Select onValueChange={setVehicleType} value={vehicleType}>
+              <Select onValueChange={(value) => {
+                setVehicleType(value);
+              }} value={vehicleType}>
                 <SelectTrigger><SelectValue placeholder="Selecione o tipo"/></SelectTrigger>
                 <SelectContent>
                     {vehicleTypes.map(type => <SelectItem key={type.codigo} value={type.codigo}>{type.nome}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Marca</Label>
-              {renderSelect("Selecione a marca", brands, selectedBrand, setSelectedBrand, fipeLoading === 'brands', !vehicleType)}
-            </div>
-            <div>
-              <Label>Modelo</Label>
-              {renderSelect("Selecione o modelo", models, selectedModel, setSelectedModel, fipeLoading === 'models', !selectedBrand)}
-            </div>
-            <div>
-              <Label>Ano</Label>
-              {renderSelect("Selecione o ano", years, selectedYear, setSelectedYear, fipeLoading === 'years', !selectedModel)}
-            </div>
+            {renderSelect("Marca", "Selecione a marca", brands, selectedBrand, setSelectedBrand, fipeLoading === 'brands', !vehicleType)}
+            {renderSelect("Modelo", "Selecione o modelo", models, selectedModel, setSelectedModel, fipeLoading === 'models', !selectedBrand)}
+            {renderSelect("Ano", "Selecione o ano", years, selectedYear, setSelectedYear, fipeLoading === 'years', !selectedModel)}
           </div>
           {fipeError && <p className="text-sm text-red-600 mt-2">{fipeError}</p>}
         </div>
@@ -294,21 +315,32 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
             </div>
           </div>
-          <div>
-            <Label htmlFor="unit">Unidade de preferência</Label>
-            <Controller
-              name="unit"
-              control={control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger id="unit"><SelectValue placeholder="Selecione a unidade" /></SelectTrigger>
-                  <SelectContent>
-                    {units.map(unit => <SelectItem key={unit.id} value={unit.id}>{unit.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.unit && <p className="text-sm text-red-600 mt-1">{errors.unit.message}</p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="unit">Unidade de preferência</Label>
+              <Controller
+                name="unit"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="unit"><SelectValue placeholder="Selecione a unidade" /></SelectTrigger>
+                    <SelectContent>
+                      {units.map(unit => <SelectItem key={unit.id} value={unit.id}>{unit.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.unit && <p className="text-sm text-red-600 mt-1">{errors.unit.message}</p>}
+            </div>
+            <div>
+                <Label htmlFor="vehiclePlate">Placa (Opcional)</Label>
+                <Controller
+                  name="vehiclePlate"
+                  control={control}
+                  render={({ field }) => <PlateInput field={field} />}
+                />
+                {errors.vehiclePlate && <p className="text-sm text-red-600 mt-1">{errors.vehiclePlate.message}</p>}
+            </div>
           </div>
         </div>
       )}
@@ -396,3 +428,5 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </form>
   );
 }
+
+    
