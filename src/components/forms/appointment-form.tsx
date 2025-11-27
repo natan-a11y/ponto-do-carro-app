@@ -16,11 +16,10 @@ import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Car, Bike, Truck, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown } from "lucide-react";
+import { Car, Bike, Truck, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -149,6 +148,9 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   const [serverState, formAction] = useFormState(scheduleAppointment, { message: null });
   const [isPending, startTransition] = useTransition();
 
+  // Estado da Etapa
+  const [step, setStep] = useState(1);
+  
   // Estados de seleção FIPE
   const [vehicleType, setVehicleType] = useState<string>('carros');
   const [selectedBrand, setSelectedBrand] = useState<FipeItem | null>(null);
@@ -171,18 +173,15 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   // Efeitos para resetar campos dependentes
   useEffect(() => {
     setSelectedBrand(null);
-    setValue("vehicleBrand", "");
-  }, [vehicleType, setValue]);
+  }, [vehicleType]);
   
   useEffect(() => {
     setSelectedModel(null);
-    setValue("vehicleModel", "");
-  }, [selectedBrand, setValue]);
+  }, [selectedBrand]);
 
   useEffect(() => {
     setSelectedYear(null);
-    setValue("vehicleYear", "");
-  }, [selectedModel, setValue]);
+  }, [selectedModel]);
   
   // Seta os valores no react-hook-form quando a seleção muda
   useEffect(() => setValue("vehicleBrand", selectedBrand?.nome || ""), [selectedBrand, setValue]);
@@ -194,6 +193,12 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     if (name === 'year' && !selectedModel) return;
     setActiveDropdown(activeDropdown === name ? null : name);
   };
+
+  const handleNextStep = () => {
+    trigger(['vehicleBrand', 'vehicleModel', 'vehicleYear']).then(isValid => {
+      if (isValid) setStep(2);
+    });
+  }
   
   const handleFinalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -211,104 +216,129 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     const selectedUnitData = units.find(u => u.id === contactValues.unit);
     
     return (
-      <Alert variant="default" className="bg-green-50 border-green-200 text-green-800">
-        <CheckCircle className="h-5 w-5 text-green-600" />
-        <AlertTitle className="font-bold text-lg">Agendamento Recebido!</AlertTitle>
-        <AlertDescription>
-          <p className="mb-4">Obrigado, <strong>{contactValues.name}</strong>! Recebemos sua solicitação para o dia <strong>{contactValues.preferredDate ? format(contactValues.preferredDate, "dd/MM/yyyy") : ''}</strong> às <strong>{contactValues.preferredTime}</strong> na <strong>{selectedUnitData?.name}</strong>. Entraremos em contato em breve para confirmar.</p>
-          <Button asChild>
-            <Link href="/">Voltar para o início</Link>
-          </Button>
-        </AlertDescription>
-      </Alert>
+      <div className="p-6">
+        <Alert variant="default" className="bg-green-50 border-green-200 text-green-800">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <AlertTitle className="font-bold text-lg">Agendamento Recebido!</AlertTitle>
+          <AlertDescription>
+            <p className="mb-4">Obrigado, <strong>{contactValues.name}</strong>! Recebemos sua solicitação para o dia <strong>{contactValues.preferredDate ? format(contactValues.preferredDate, "dd/MM/yyyy") : ''}</strong> às <strong>{contactValues.preferredTime}</strong> na <strong>{selectedUnitData?.name}</strong>. Entraremos em contato em breve para confirmar.</p>
+            <Button asChild>
+              <Link href="/">Voltar para o início</Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
     );
   }
 
   return (
     <form onSubmit={handleFinalSubmit} className="space-y-6">
       
-      {/* --- SELEÇÃO DE VEÍCULO --- */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800">1. Selecione o seu veículo</h2>
-            <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                <VehicleTypeIcon active={vehicleType === 'carros'} onClick={() => setVehicleType('carros')} icon={<Car size={18} />} />
-                <VehicleTypeIcon active={vehicleType === 'motos'} onClick={() => setVehicleType('motos')} icon={<Bike size={18} />} />
-                <VehicleTypeIcon active={vehicleType === 'caminhoes'} onClick={() => setVehicleType('caminhoes')} icon={<Truck size={18} />} />
-            </div>
-        </div>
-        
-        <div className="flex flex-col gap-4 relative">
-            <input type="hidden" name="vehicleBrand" value={getValues("vehicleBrand")} />
-            <input type="hidden" name="vehicleModel" value={getValues("vehicleModel")} />
-            <input type="hidden" name="vehicleYear" value={getValues("vehicleYear")} />
+      {/* Etapa 1: Seleção de Veículo */}
+      <div className={cn(step !== 1 && 'hidden')}>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-800">1. Selecione o seu veículo</h2>
+              <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+                  <VehicleTypeIcon active={vehicleType === 'carros'} onClick={() => setVehicleType('carros')} icon={<Car size={18} />} />
+                  <VehicleTypeIcon active={vehicleType === 'motos'} onClick={() => setVehicleType('motos')} icon={<Bike size={18} />} />
+                  <VehicleTypeIcon active={vehicleType === 'caminhoes'} onClick={() => setVehicleType('caminhoes')} icon={<Truck size={18} />} />
+              </div>
+          </div>
+          
+          <div className="flex flex-col gap-4 relative">
+              <input type="hidden" name="vehicleBrand" value={getValues("vehicleBrand")} />
+              <input type="hidden" name="vehicleModel" value={getValues("vehicleModel")} />
+              <input type="hidden" name="vehicleYear" value={getValues("vehicleYear")} />
 
-           <SelectionFieldBlock 
-              label="Marca"
-              value={selectedBrand?.nome}
-              placeholder={brandsLoading ? "Carregando..." : "Selecione a marca"}
-              isOpen={activeDropdown === 'brand'}
-              onClick={() => toggleDropdown('brand')}
-              icon={<Tag size={18} />}
-            />
             <SelectionFieldBlock 
-              label="Modelo"
-              value={selectedModel?.nome}
-              placeholder={modelsLoading ? "Carregando..." : "Selecione o modelo"}
-              isOpen={activeDropdown === 'model'}
-              onClick={() => toggleDropdown('model')}
-              disabled={!selectedBrand || models.length === 0}
-              icon={<Car size={18} />}
-            />
-            <SelectionFieldBlock 
-              label="Ano"
-              value={selectedYear?.nome}
-              placeholder={yearsLoading ? "Carregando..." : "Selecione o ano"}
-              isOpen={activeDropdown === 'year'}
-              onClick={() => toggleDropdown('year')}
-              disabled={!selectedModel || years.length === 0}
-              icon={<CalendarIcon size={18} />}
-            />
+                label="Marca"
+                value={selectedBrand?.nome}
+                placeholder={brandsLoading ? "Carregando..." : "Selecione a marca"}
+                isOpen={activeDropdown === 'brand'}
+                onClick={() => toggleDropdown('brand')}
+                icon={<Tag size={18} />}
+              />
+              <SelectionFieldBlock 
+                label="Modelo"
+                value={selectedModel?.nome}
+                placeholder={modelsLoading ? "Carregando..." : "Selecione o modelo"}
+                isOpen={activeDropdown === 'model'}
+                onClick={() => toggleDropdown('model')}
+                disabled={!selectedBrand || models.length === 0}
+                icon={<Car size={18} />}
+              />
+              <SelectionFieldBlock 
+                label="Ano"
+                value={selectedYear?.nome}
+                placeholder={yearsLoading ? "Carregando..." : "Selecione o ano"}
+                isOpen={activeDropdown === 'year'}
+                onClick={() => toggleDropdown('year')}
+                disabled={!selectedModel || years.length === 0}
+                icon={<CalendarIcon size={18} />}
+              />
 
-            {activeDropdown === 'brand' && (
-              <DropdownList 
-                items={brands} 
-                onSelect={(item) => { setSelectedBrand(item); setActiveDropdown('model'); }} 
-                title="Selecione a Marca"
-                searchable
-                onClose={() => setActiveDropdown(null)}
-                loading={brandsLoading}
-                error={brandsError}
-              />
-            )}
-            {activeDropdown === 'model' && (
-              <DropdownList 
-                items={models} 
-                onSelect={(item) => { setSelectedModel(item); setActiveDropdown('year'); }} 
-                title="Selecione o Modelo"
-                searchable
-                onClose={() => setActiveDropdown(null)}
-                loading={modelsLoading}
-                error={modelsError}
-              />
-            )}
-            {activeDropdown === 'year' && (
-              <DropdownList 
-                items={years} 
-                onSelect={(item) => { setSelectedYear(item); setActiveDropdown(null); }} 
-                title="Selecione o Ano"
-                onClose={() => setActiveDropdown(null)}
-                loading={yearsLoading}
-                error={yearsError}
-              />
-            )}
+              {activeDropdown === 'brand' && (
+                <DropdownList 
+                  items={brands} 
+                  onSelect={(item) => { setSelectedBrand(item); setActiveDropdown('model'); }} 
+                  title="Selecione a Marca"
+                  searchable
+                  onClose={() => setActiveDropdown(null)}
+                  loading={brandsLoading}
+                  error={brandsError}
+                />
+              )}
+              {activeDropdown === 'model' && (
+                <DropdownList 
+                  items={models} 
+                  onSelect={(item) => { setSelectedModel(item); setActiveDropdown('year'); }} 
+                  title="Selecione o Modelo"
+                  searchable
+                  onClose={() => setActiveDropdown(null)}
+                  loading={modelsLoading}
+                  error={modelsError}
+                />
+              )}
+              {activeDropdown === 'year' && (
+                <DropdownList 
+                  items={years} 
+                  onSelect={(item) => { setSelectedYear(item); setActiveDropdown(null); }} 
+                  title="Selecione o Ano"
+                  onClose={() => setActiveDropdown(null)}
+                  loading={yearsLoading}
+                  error={yearsError}
+                />
+              )}
+          </div>
+          <div className="pt-2">
+            <Button 
+                type="button" 
+                onClick={handleNextStep}
+                disabled={!selectedYear}
+                size="lg" 
+                className="w-full"
+              >
+              Avançar
+            </Button>
+          </div>
         </div>
       </div>
       
-      <Collapsible open={!!selectedYear}>
-        <CollapsibleContent>
-          <div className="space-y-6 pt-6 border-t border-dashed mt-6">
-            <h3 className="text-lg font-semibold text-gray-800">2. Contato e Unidade</h3>
+      {/* Etapa 2: Contato e Agendamento */}
+      <div className={cn("animate-in fade-in duration-300", step !== 2 && 'hidden')}>
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => setStep(1)} className="p-2 hover:bg-muted rounded-full">
+                <ArrowLeft size={16} />
+              </button>
+              <div>
+                <p className="text-sm font-semibold text-primary">{selectedBrand?.nome} {selectedModel?.nome}</p>
+                <p className="text-xs text-muted-foreground">{selectedYear?.nome}</p>
+              </div>
+            </div>
+
+            <h3 className="text-lg font-semibold text-gray-800 border-t pt-4">2. Contato e Unidade</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="name">Seu nome</Label>
@@ -349,7 +379,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
                 {errors.unit && <p className="text-sm text-red-600 mt-1">{errors.unit.message}</p>}
               </div>
               
-              <h3 className="text-lg font-semibold text-gray-800 pt-4">3. Data e Horário</h3>
+              <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">3. Data e Horário</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col items-center">
                 <Label className="mb-2 self-start">Data de preferência</Label>
@@ -423,8 +453,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               </Button>
             </div>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
+      </div>
 
 
        {serverState?.message && !serverState.success && (
@@ -437,5 +466,3 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </form>
   );
 }
-
-    
