@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
@@ -50,7 +51,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 // Input com máscara para Telefone
-const PhoneInput = ({ field, ...props }: { field: any }) => {
+const PhoneInput = ({ field, ...props }: { field: any, id: string }) => {
     const { ref } = useIMask({ 
       mask: '(00) 00000-0000',
       onAccept: (value: any) => field.onChange(value)
@@ -62,11 +63,6 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   const [step, setStep] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [state, formAction] = useFormState(scheduleAppointment, { message: null });
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const vehicleTypes: FipeData[] = [
       { nome: 'Carro', codigo: 'carros' },
@@ -83,6 +79,10 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
       vehicleModel: '',
       vehicleYear: '',
       vehiclePlate: '',
+      name: '',
+      phone: '',
+      unit: '',
+      preferredTime: '',
     },
   });
 
@@ -98,17 +98,25 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
   // Limpa os campos dependentes quando a seleção principal muda
   useEffect(() => {
-      if (!isClient) return;
-      setValue('vehicleBrand', '');
-      setValue('vehicleModel', '');
-      setValue('vehicleYear', '');
-  }, [watchedVehicleType, setValue, isClient]);
+    if (watchedVehicleType) {
+        setValue('vehicleBrand', '');
+        setValue('vehicleModel', '');
+        setValue('vehicleYear', '');
+    }
+  }, [watchedVehicleType, setValue]);
 
   useEffect(() => {
-      if (!isClient) return;
-      setValue('vehicleModel', '');
-      setValue('vehicleYear', '');
-  }, [watchedVehicleBrand, setValue, isClient]);
+      if(watchedVehicleBrand) {
+        setValue('vehicleModel', '');
+        setValue('vehicleYear', '');
+      }
+  }, [watchedVehicleBrand, setValue]);
+
+   useEffect(() => {
+      if(watchedVehicleModel) {
+        setValue('vehicleYear', '');
+      }
+  }, [watchedVehicleModel, setValue]);
 
 
   const nextStep = async () => {
@@ -131,11 +139,9 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
     const finalData = { 
       ...data, 
-      vehicleBrandName: brandName, 
-      vehicleModelName: modelName,
-      vehicleYearName: yearData?.nome || '',
-      codigoFipe: data.vehicleModel, // O código do modelo é o código FIPE
-      anoModelo: data.vehicleYear, // O código do ano é o ano/combustível
+      vehicleBrand: brandName, // send name instead of code
+      vehicleModel: modelName, // send name instead of code
+      vehicleYear: yearData?.nome || '', // send name instead of code
     };
 
     Object.entries(finalData).forEach(([key, value]) => {
@@ -198,19 +204,19 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <div>
               <Label>Tipo de Veículo</Label>
-              {renderSelect("vehicleType", "Selecione o tipo", vehicleTypes, false, !isClient)}
+              {renderSelect("vehicleType", "Selecione o tipo", vehicleTypes, false, false)}
             </div>
             <div>
               <Label>Marca</Label>
-              {renderSelect("vehicleBrand", "Selecione a marca", brands, loadingBrands, !isClient || !watchedVehicleType, errorBrands)}
+              {renderSelect("vehicleBrand", "Selecione a marca", brands, loadingBrands, !watchedVehicleType, errorBrands)}
             </div>
             <div>
               <Label>Modelo</Label>
-              {renderSelect("vehicleModel", "Selecione o modelo", models, loadingModels, !isClient || !watchedVehicleBrand, errorModels)}
+              {renderSelect("vehicleModel", "Selecione o modelo", models, loadingModels, !watchedVehicleBrand, errorModels)}
             </div>
             <div>
               <Label>Ano</Label>
-              {renderSelect("vehicleYear", "Selecione o ano", years, loadingYears, !isClient || !watchedVehicleModel, errorYears)}
+              {renderSelect("vehicleYear", "Selecione o ano", years, loadingYears, !watchedVehicleModel, errorYears)}
             </div>
             <div className="md:col-span-2">
               <Label htmlFor="vehiclePlate">Placa do Veículo (Opcional)</Label>
@@ -344,3 +350,5 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </form>
   );
 }
+
+    

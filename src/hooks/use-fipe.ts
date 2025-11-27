@@ -9,10 +9,9 @@ type FipeData = { nome: string; codigo: string };
 type FipeModelsResponse = { modelos: FipeData[] };
 
 /**
- * Hook genérico e "burro" para buscar dados da API FIPE.
- * Ele não faz nenhuma suposição sobre o formato dos dados, apenas busca a URL.
+ * Hook genérico para buscar dados da API FIPE.
  */
-function useFipe<T>(url: string | null) {
+function useFipe<T>(url: string | null): { data: T | null; loading: boolean; error: string | null } {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,15 +29,16 @@ function useFipe<T>(url: string | null) {
       try {
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error(`Falha ao buscar dados: ${response.statusText}`);
+          throw new Error(`Falha ao buscar dados da FIPE: ${response.statusText}`);
         }
         const result = await response.json();
         if (isMounted) {
           setData(result);
         }
       } catch (err: any) {
+        console.error("FIPE API Error:", err);
         if (isMounted) {
-          setError(err.message || 'Ocorreu um erro.');
+          setError(err.message || 'Ocorreu um erro ao buscar na API FIPE.');
         }
       } finally {
         if (isMounted) {
@@ -74,6 +74,7 @@ export function useFipeBrands(vehicleType?: string) {
 export function useFipeModels(vehicleType?: string, brandCode?: string) {
     const url = vehicleType && brandCode ? `${API_BASE_URL}/${vehicleType}/marcas/${brandCode}/modelos` : null;
     const { data, loading, error } = useFipe<FipeModelsResponse>(url);
+    // A API de modelos retorna { modelos: [], anos: [] }, então pegamos apenas modelos.
     return { data: data?.modelos && Array.isArray(data.modelos) ? data.modelos : [], loading, error };
 }
 
@@ -86,3 +87,5 @@ export function useFipeYears(vehicleType?: string, brandCode?: string, modelCode
   const { data, loading, error } = useFipe<FipeData[]>(url);
   return { data: Array.isArray(data) ? data : [], loading, error };
 }
+
+    
