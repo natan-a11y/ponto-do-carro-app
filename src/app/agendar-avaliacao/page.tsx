@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function AgendarAvaliacaoPage() {
   return (
-    <div className="w-full bg-[#F8F9FA] text-gray-800 font-body">
+    <div className="w-full bg-[#F8F9FA] text-gray-800">
       <main className="w-full max-w-7xl mx-auto px-6 py-16 md:py-24 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10">
         
         {/* Lado Esquerdo: CTA */}
@@ -56,7 +56,6 @@ export default function AgendarAvaliacaoPage() {
               </div>
            </div>
         </div>
-
       </main>
     </div>
   );
