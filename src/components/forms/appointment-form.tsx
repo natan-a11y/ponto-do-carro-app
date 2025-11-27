@@ -5,7 +5,7 @@ import { useFormState } from "react-dom";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useIMask, IMask } from "react-imask";
+import { useIMask } from "react-imask";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,22 +57,6 @@ const PhoneInput = ({ field, ...props }: { field: any }) => {
     });
     return <Input {...props} ref={ref} defaultValue={field.value} />;
 };
-
-// Input com máscara para Placa (Padrão e Mercosul)
-const PlateInput = ({ field, ...props }: { field: any }) => {
-    const { ref } = useIMask({
-      mask: 'AAA-0*00',
-      prepare: (str) => str.toUpperCase(),
-      blocks: {
-        A: { mask: IMask.Masked.RegExp, pattern: /[A-Z]/ },
-        '0': { mask: IMask.Masked.RegExp, pattern: /[0-9]/ },
-        '*': { mask: IMask.Masked.RegExp, pattern: /[A-Z0-9]/ }
-      },
-      onAccept: (value: any) => field.onChange(value)
-    });
-    return <Input {...props} ref={ref} defaultValue={field.value} placeholder="ABC-1234" />;
-}
-
 
 export function AppointmentForm({ units }: { units: Unit[] }) {
   const [step, setStep] = useState(1);
@@ -230,10 +214,14 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
             </div>
             <div className="md:col-span-2">
               <Label htmlFor="vehiclePlate">Placa do Veículo (Opcional)</Label>
-              <Controller
-                name="vehiclePlate"
-                control={control}
-                render={({ field }) => <PlateInput field={field} id="vehiclePlate" />}
+              <Input
+                id="vehiclePlate"
+                placeholder="ABC-1234"
+                {...register("vehiclePlate")}
+                onChange={(e) => {
+                  e.target.value = e.target.value.toUpperCase();
+                  register("vehiclePlate").onChange(e);
+                }}
               />
               {errors.vehiclePlate && <p className="text-sm text-red-600 mt-1">{errors.vehiclePlate.message}</p>}
             </div>
@@ -356,5 +344,3 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </form>
   );
 }
-
-    
