@@ -27,15 +27,15 @@ import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
 // FIPE API types
 type FipeData = { nome: string; codigo: string };
 
-const plateRegex = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
+const plateRegex = /^[A-Z]{3}-?[0-9][A-Z0-9][0-9]{2}$/;
 
 const formSchema = z.object({
   vehicleType: z.string().min(1, "Tipo de veículo é obrigatório"),
   vehicleBrand: z.string().min(1, "Marca é obrigatória"),
   vehicleModel: z.string().min(1, "Modelo é obrigatório"),
   vehicleYear: z.string().min(1, "Ano é obrigatório"),
-  vehiclePlate: z.string().refine((value) => value === "" || plateRegex.test(value.replace("-", "")), {
-    message: "Placa inválida. Use o formato AAA-1234 ou ABC1D23.",
+  vehiclePlate: z.string().refine((value) => value === "" || plateRegex.test(value.toUpperCase()), {
+    message: "Placa inválida.",
   }).optional(),
   name: z.string().min(2, "Nome é obrigatório"),
   phone: z.string().min(15, "Telefone inválido"),
@@ -64,22 +64,13 @@ const PlateInput = ({ field, ...props }: { field: any }) => {
       mask: 'AAA-0*00',
       prepare: (str) => str.toUpperCase(),
       blocks: {
-        A: {
-          mask: IMask.Masked.RegExp,
-          pattern: /[A-Z]/,
-        },
-        '0': {
-            mask: IMask.Masked.RegExp,
-            pattern: /[0-9]/,
-        },
-        '*': {
-            mask: IMask.Masked.RegExp,
-            pattern: /[A-Z0-9]/,
-        }
+        A: { mask: IMask.Masked.RegExp, pattern: /[A-Z]/ },
+        '0': { mask: IMask.Masked.RegExp, pattern: /[0-9]/ },
+        '*': { mask: IMask.Masked.RegExp, pattern: /[A-Z0-9]/ }
       },
       onAccept: (value: any) => field.onChange(value)
     });
-    return <Input {...props} ref={ref} defaultValue={field.value} />;
+    return <Input {...props} ref={ref} defaultValue={field.value} placeholder="ABC-1234" />;
 }
 
 
@@ -242,7 +233,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               <Controller
                 name="vehiclePlate"
                 control={control}
-                render={({ field }) => <PlateInput field={field} id="vehiclePlate" placeholder="ABC-1234" />}
+                render={({ field }) => <PlateInput field={field} id="vehiclePlate" />}
               />
               {errors.vehiclePlate && <p className="text-sm text-red-600 mt-1">{errors.vehiclePlate.message}</p>}
             </div>
@@ -365,3 +356,5 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </form>
   );
 }
+
+    
