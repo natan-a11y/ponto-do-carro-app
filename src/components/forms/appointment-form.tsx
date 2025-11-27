@@ -16,7 +16,7 @@ import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Car, Bike, Truck, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft } from "lucide-react";
+import { Car, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -54,18 +54,6 @@ const PhoneInput = React.forwardRef<HTMLInputElement, { field: any }>(({ field }
     return <Input {...field} ref={iMaskRef as React.Ref<HTMLInputElement>} defaultValue={field.value} />;
 });
 PhoneInput.displayName = 'PhoneInput';
-
-const VehicleTypeIcon = ({ active, onClick, icon }: { active: boolean, onClick: ()=>void, icon: React.ReactNode }) => (
-  <button 
-    type="button"
-    onClick={onClick}
-    className={cn(`p-2 rounded-md transition-all duration-200`,
-      active ? 'bg-white shadow-sm text-black' : 'text-gray-400 hover:text-gray-600'
-    )}
-  >
-    {icon}
-  </button>
-);
 
 const SelectionFieldBlock = ({ label, value, placeholder, isOpen, onClick, disabled, icon }: { label:string, value?:string, placeholder:string, isOpen:boolean, onClick:()=>void, disabled?:boolean, icon:React.ReactNode }) => (
   <div 
@@ -152,7 +140,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   const [step, setStep] = useState(1);
   
   // Estados de seleção FIPE
-  const [vehicleType, setVehicleType] = useState<string>('carros');
+  const vehicleType = 'carros';
   const [selectedBrand, setSelectedBrand] = useState<FipeItem | null>(null);
   const [selectedModel, setSelectedModel] = useState<FipeItem | null>(null);
   const [selectedYear, setSelectedYear] = useState<FipeItem | null>(null);
@@ -171,11 +159,6 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   });
 
   // Efeitos para resetar campos dependentes
-  useEffect(() => {
-    setSelectedBrand(null);
-    setValue("vehicleBrand", "");
-  }, [vehicleType, setValue]);
-  
   useEffect(() => {
     setSelectedModel(null);
     setValue("vehicleModel", "");
@@ -254,10 +237,10 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-800">1. Selecione o seu veículo</h2>
-              <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                  <VehicleTypeIcon active={vehicleType === 'carros'} onClick={() => setVehicleType('carros')} icon={<Car size={18} />} />
-                  <VehicleTypeIcon active={vehicleType === 'motos'} onClick={() => setVehicleType('motos')} icon={<Bike size={18} />} />
-                  <VehicleTypeIcon active={vehicleType === 'caminhoes'} onClick={() => setVehicleType('caminhoes')} icon={<Truck size={18} />} />
+               <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+                  <div className="p-2 rounded-md bg-white shadow-sm text-black">
+                     <Car size={18} />
+                  </div>
               </div>
           </div>
           
