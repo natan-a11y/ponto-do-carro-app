@@ -1,12 +1,17 @@
 
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
-import { useFormState } from "react-dom";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useState, useEffect, useTransition } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useFormState } from "react-dom";
 import { useIMask } from "react-imask";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+import { scheduleAppointment } from "@/app/actions";
+import { type Unit, TIME_SLOTS } from "@/lib/data";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,29 +20,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
-import { scheduleAppointment } from "@/app/actions";
-import { type Unit, TIME_SLOTS } from "@/lib/data";
-import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns";
-import { ptBR } from 'date-fns/locale';
-import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
+import { cn } from "@/lib/utils";
 
-// FIPE API types
-type FipeData = { nome: string; codigo: string };
+// --- Tipos e Schema ---
 
-const plateRegex = /^[A-Z]{3}-?[0-9][A-Z0-9][0-9]{2}$/;
+type FipeItem = { nome: string; codigo: string };
 
 const formSchema = z.object({
-  vehicleType: z.string().min(1, "Tipo de veículo é obrigatório"),
-  vehicleBrand: z.string().min(1, "Marca é obrigatória"),
-  vehicleModel: z.string().min(1, "Modelo é obrigatório"),
-  vehicleYear: z.string().min(1, "Ano é obrigatório"),
-  vehiclePlate: z.string().refine((value) => value === "" || plateRegex.test(value.toUpperCase()), {
-    message: "Placa inválida.",
-  }).optional(),
   name: z.string().min(2, "Nome é obrigatório"),
   phone: z.string().min(15, "Telefone inválido"),
   unit: z.string().min(1, "Unidade é obrigatória"),
@@ -50,100 +42,158 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-// Input com máscara para Telefone
-const PhoneInput = ({ field, ...props }: { field: any, id: string }) => {
-    const { ref } = useIMask({ 
+const FIPE_BASE_URL = 'https://parallelum.com.br/fipe/api/v1';
+
+const vehicleTypes: FipeItem[] = [
+    { nome: 'Carro', codigo: 'carros' },
+    { nome: 'Moto', codigo: 'motos' },
+    { nome: 'Caminhão', codigo: 'caminhoes' },
+];
+
+// --- Componentes Auxiliares ---
+
+const PhoneInput = React.forwardRef<HTMLInputElement, { field: any }>(({ field }, ref) => {
+    const { ref: iMaskRef } = useIMask({ 
       mask: '(00) 00000-0000',
       onAccept: (value: any) => field.onChange(value)
     });
-    return <Input {...props} ref={ref} defaultValue={field.value} />;
-};
+    return <Input {...field} ref={iMaskRef} defaultValue={field.value} />;
+});
+PhoneInput.displayName = 'PhoneInput';
+
+// --- Componente Principal do Formulário ---
 
 export function AppointmentForm({ units }: { units: Unit[] }) {
   const [step, setStep] = useState(1);
   const [isPending, startTransition] = useTransition();
-  const [state, formAction] = useFormState(scheduleAppointment, { message: null });
+  const [serverState, formAction] = useFormState(scheduleAppointment, { message: null });
 
-  const vehicleTypes: FipeData[] = [
-      { nome: 'Carro', codigo: 'carros' },
-      { nome: 'Moto', codigo: 'motos' },
-      { nome: 'Caminhão', codigo: 'caminhoes' },
-  ];
+  // Estados de seleção FIPE
+  const [vehicleType, setVehicleType] = useState<string>('carros');
+  const [selectedBrand, setSelectedBrand] = useState<FipeItem | null>(null);
+  const [selectedModel, setSelectedModel] = useState<FipeItem | null>(null);
+  const [selectedYear, setSelectedYear] = useState<FipeItem | null>(null);
 
-  const form = useForm<FormData>({
+  // Estados de dados da API
+  const [brands, setBrands] = useState<FipeItem[]>([]);
+  const [models, setModels] = useState<FipeItem[]>([]);
+  const [years, setYears] = useState<FipeItem[]>([]);
+  
+  // Estados de UI da FIPE
+  const [fipeLoading, setFipeLoading] = useState<string | null>(null);
+  const [fipeError, setFipeError] = useState<string | null>(null);
+
+  const { register, control, trigger, getValues, formState: { errors, isValid } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
+      name: "",
+      phone: "",
+      unit: "",
+      preferredTime: "",
       lgpdConsent: false,
-      vehicleType: '',
-      vehicleBrand: '',
-      vehicleModel: '',
-      vehicleYear: '',
-      vehiclePlate: '',
-      name: '',
-      phone: '',
-      unit: '',
-      preferredTime: '',
     },
   });
 
-  const { register, control, trigger, getValues, setValue, formState: { errors } } = form;
+  // 1. Buscar Marcas
+  useEffect(() => {
+    const fetchBrands = async () => {
+        setFipeLoading('brands');
+        setFipeError(null);
+        // Reset
+        setSelectedBrand(null);
+        setSelectedModel(null);
+        setSelectedYear(null);
+        setModels([]);
+        setYears([]);
+        try {
+            const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas`);
+            const data = await response.json();
+            setBrands(data);
+        } catch (err) {
+            setFipeError("Erro ao carregar marcas.");
+        } finally {
+            setFipeLoading(null);
+        }
+    };
+    fetchBrands();
+  }, [vehicleType]);
 
-  const watchedVehicleType = useWatch({ control, name: 'vehicleType' });
-  const watchedVehicleBrand = useWatch({ control, name: 'vehicleBrand' });
-  const watchedVehicleModel = useWatch({ control, name: 'vehicleModel' });
+  // 2. Buscar Modelos
+  useEffect(() => {
+    if (!selectedBrand) return;
+    const fetchModels = async () => {
+        setFipeLoading('models');
+        setFipeError(null);
+        // Reset
+        setSelectedModel(null);
+        setSelectedYear(null);
+        setYears([]);
+        try {
+            const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas/${selectedBrand.codigo}/modelos`);
+            const data = await response.json();
+            setModels(data.modelos);
+        } catch (err) {
+            setFipeError("Erro ao carregar modelos.");
+        } finally {
+            setFipeLoading(null);
+        }
+    };
+    fetchModels();
+  }, [selectedBrand, vehicleType]);
   
-  const { data: brands, loading: loadingBrands, error: errorBrands } = useFipeBrands(watchedVehicleType);
-  const { data: models, loading: loadingModels, error: errorModels } = useFipeModels(watchedVehicleType, watchedVehicleBrand);
-  const { data: years, loading: loadingYears, error: errorYears } = useFipeYears(watchedVehicleType, watchedVehicleBrand, watchedVehicleModel);
-
-  // Limpa os campos dependentes quando a seleção principal muda
+  // 3. Buscar Anos
   useEffect(() => {
-    if (watchedVehicleType) {
-        setValue('vehicleBrand', '');
-        setValue('vehicleModel', '');
-        setValue('vehicleYear', '');
-    }
-  }, [watchedVehicleType, setValue]);
-
-  useEffect(() => {
-      if(watchedVehicleBrand) {
-        setValue('vehicleModel', '');
-        setValue('vehicleYear', '');
-      }
-  }, [watchedVehicleBrand, setValue]);
-
-   useEffect(() => {
-      if(watchedVehicleModel) {
-        setValue('vehicleYear', '');
-      }
-  }, [watchedVehicleModel, setValue]);
+    if (!selectedModel) return;
+    const fetchYears = async () => {
+        setFipeLoading('years');
+        setFipeError(null);
+        // Reset
+        setSelectedYear(null);
+        try {
+            const response = await fetch(`${FIPE_BASE_URL}/${vehicleType}/marcas/${selectedBrand!.codigo}/modelos/${selectedModel.codigo}/anos`);
+            const data = await response.json();
+            setYears(data);
+        } catch (err) {
+            setFipeError("Erro ao carregar anos.");
+        } finally {
+            setFipeLoading(null);
+        }
+    };
+    fetchYears();
+  }, [selectedModel, selectedBrand, vehicleType]);
 
 
   const nextStep = async () => {
-    const fields: (keyof FormData)[] = step === 1
-      ? ["vehicleType", "vehicleBrand", "vehicleModel", "vehicleYear", "vehiclePlate"]
-      : ["name", "phone", "unit"];
+    let isValidStep = false;
+    if (step === 1) {
+        isValidStep = !!(vehicleType && selectedBrand && selectedModel && selectedYear);
+    } else if (step === 2) {
+        isValidStep = await trigger(["name", "phone", "unit"]);
+    }
     
-    const isValid = await trigger(fields);
-    if (isValid) setStep(s => s + 1);
+    if (isValidStep) {
+      setStep(s => s + 1);
+    }
   };
 
   const prevStep = () => setStep(s => s - 1);
 
   const onSubmit = (data: FormData) => {
+    if (!selectedBrand || !selectedModel || !selectedYear) {
+      // Segurança extra, mas o botão de submit deve estar desabilitado
+      return;
+    }
     const formData = new FormData();
     
-    const brandName = brands.find(b => b.codigo === data.vehicleBrand)?.nome || '';
-    const modelName = models.find(m => m.codigo === data.vehicleModel)?.nome || '';
-    const yearData = years.find(y => y.codigo === data.vehicleYear);
-
     const finalData = { 
-      ...data, 
-      vehicleBrand: brandName, // send name instead of code
-      vehicleModel: modelName, // send name instead of code
-      vehicleYear: yearData?.nome || '', // send name instead of code
+      ...data,
+      vehicleType,
+      vehicleBrand: selectedBrand.nome,
+      vehicleModel: selectedModel.nome,
+      vehicleYear: selectedYear.nome,
     };
-
+    
     Object.entries(finalData).forEach(([key, value]) => {
       if (value instanceof Date) {
         formData.append(key, value.toISOString());
@@ -155,16 +205,16 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     startTransition(() => { formAction(formData); });
   };
   
-  if (state?.success) {
-    const values = getValues();
-    const selectedUnit = units.find(u => u.id === values.unit);
+  if (serverState?.success) {
+    const contactValues = getValues();
+    const selectedUnitData = units.find(u => u.id === contactValues.unit);
     
     return (
       <Alert variant="default" className="bg-green-50 border-green-200 text-green-800">
         <CheckCircle className="h-5 w-5 text-green-600" />
         <AlertTitle className="font-bold text-lg">Agendamento Recebido!</AlertTitle>
         <AlertDescription>
-          <p className="mb-4">Obrigado, <strong>{values.name}</strong>! Recebemos sua solicitação para o dia <strong>{format(values.preferredDate, "dd/MM/yyyy")}</strong> às <strong>{values.preferredTime}</strong> na <strong>{selectedUnit?.name}</strong>. Entraremos em contato em breve para confirmar.</p>
+          <p className="mb-4">Obrigado, <strong>{contactValues.name}</strong>! Recebemos sua solicitação para o dia <strong>{format(contactValues.preferredDate, "dd/MM/yyyy")}</strong> às <strong>{contactValues.preferredTime}</strong> na <strong>{selectedUnitData?.name}</strong>. Entraremos em contato em breve para confirmar.</p>
           <Button asChild>
             <Link href="/">Voltar para o início</Link>
           </Button>
@@ -173,29 +223,30 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     );
   }
 
-  const renderSelect = (name: keyof FormData, placeholder: string, items: FipeData[], isLoading: boolean, isDisabled: boolean, error?: string | null) => (
-    <div>
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => (
-          <Select onValueChange={field.onChange} value={field.value} disabled={isDisabled || isLoading}>
-            <SelectTrigger>
-              <SelectValue placeholder={isLoading ? 'Carregando...' : placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-              {items.map(item => <SelectItem key={item.codigo} value={item.codigo}>{item.nome}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        )}
-      />
-      {errors[name] && <p className="text-sm text-red-600 mt-1">{(errors[name] as any).message}</p>}
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
-    </div>
+  const renderSelect = (
+      placeholder: string, 
+      items: FipeItem[], 
+      selectedValue: FipeItem | null,
+      onSelect: (item: FipeItem | null) => void,
+      isLoading: boolean, 
+      isDisabled: boolean,
+    ) => (
+    <Select 
+        onValueChange={(code) => onSelect(items.find(item => item.codigo === code) || null)}
+        value={selectedValue?.codigo || ""}
+        disabled={isDisabled || isLoading}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder={isLoading ? 'Carregando...' : placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {items.map(item => <SelectItem key={item.codigo} value={item.codigo}>{item.nome}</SelectItem>)}
+      </SelectContent>
+    </Select>
   );
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(onSubmit)(); }} className="space-y-8">
       <Progress value={(step / 3) * 100} className="mb-8" />
       
       {step === 1 && (
@@ -204,34 +255,27 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <div>
               <Label>Tipo de Veículo</Label>
-              {renderSelect("vehicleType", "Selecione o tipo", vehicleTypes, false, false)}
+              <Select onValueChange={setVehicleType} value={vehicleType}>
+                <SelectTrigger><SelectValue placeholder="Selecione o tipo"/></SelectTrigger>
+                <SelectContent>
+                    {vehicleTypes.map(type => <SelectItem key={type.codigo} value={type.codigo}>{type.nome}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Marca</Label>
-              {renderSelect("vehicleBrand", "Selecione a marca", brands, loadingBrands, !watchedVehicleType, errorBrands)}
+              {renderSelect("Selecione a marca", brands, selectedBrand, setSelectedBrand, fipeLoading === 'brands', !vehicleType)}
             </div>
             <div>
               <Label>Modelo</Label>
-              {renderSelect("vehicleModel", "Selecione o modelo", models, loadingModels, !watchedVehicleBrand, errorModels)}
+              {renderSelect("Selecione o modelo", models, selectedModel, setSelectedModel, fipeLoading === 'models', !selectedBrand)}
             </div>
             <div>
               <Label>Ano</Label>
-              {renderSelect("vehicleYear", "Selecione o ano", years, loadingYears, !watchedVehicleModel, errorYears)}
-            </div>
-            <div className="md:col-span-2">
-              <Label htmlFor="vehiclePlate">Placa do Veículo (Opcional)</Label>
-              <Input
-                id="vehiclePlate"
-                placeholder="ABC-1234"
-                {...register("vehiclePlate")}
-                onChange={(e) => {
-                  e.target.value = e.target.value.toUpperCase();
-                  register("vehiclePlate").onChange(e);
-                }}
-              />
-              {errors.vehiclePlate && <p className="text-sm text-red-600 mt-1">{errors.vehiclePlate.message}</p>}
+              {renderSelect("Selecione o ano", years, selectedYear, setSelectedYear, fipeLoading === 'years', !selectedModel)}
             </div>
           </div>
+          {fipeError && <p className="text-sm text-red-600 mt-2">{fipeError}</p>}
         </div>
       )}
 
@@ -249,7 +293,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
                <Controller
                 name="phone"
                 control={control}
-                render={({ field }) => <PhoneInput field={field} id="phone" />}
+                render={({ field }) => <PhoneInput field={field} />}
               />
               {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
             </div>
@@ -336,19 +380,23 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
       <div className={cn("flex pt-4", step > 1 ? "justify-between" : "justify-end")}>
         {step > 1 && <Button type="button" variant="outline" onClick={prevStep}>Anterior</Button>}
+        
         {step < 3 && <Button type="button" onClick={nextStep} variant="accent">Próximo</Button>}
-        {step === 3 && <Button type="submit" disabled={isPending} variant="accent">{isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}</Button>}
+        
+        {step === 3 && (
+            <Button type="submit" disabled={isPending || !isValid} variant="accent">
+                {isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}
+            </Button>
+        )}
       </div>
 
-       {state?.message && !state.success && (
+       {serverState?.message && !serverState.success && (
         <Alert variant="destructive" className="mt-4">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Erro no Agendamento</AlertTitle>
-          <AlertDescription>{state.message}</AlertDescription>
+          <AlertDescription>{serverState.message}</AlertDescription>
         </Alert>
       )}
     </form>
   );
 }
-
-    

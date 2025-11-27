@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from 'react';
 
 const API_BASE_URL = 'https://parallelum.com.br/fipe/api/v1';
@@ -87,5 +88,3 @@ export function useFipeYears(vehicleType?: string, brandCode?: string, modelCode
   const { data, loading, error } = useFipe<FipeData[]>(url);
   return { data: Array.isArray(data) ? data : [], loading, error };
 }
-
-    
