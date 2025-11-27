@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,6 +20,7 @@ import { Car, Bike, Truck, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Ca
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -43,20 +44,13 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-
 // --- Componentes Auxiliares ---
 
 const PhoneInput = React.forwardRef<HTMLInputElement, { field: any }>(({ field }, ref) => {
-    const { ref: iMaskRef, setValue } = useIMask({ 
+    const { ref: iMaskRef } = useIMask({ 
       mask: '(00) 00000-0000',
       onAccept: (value: any) => field.onChange(value)
     });
-
-    useEffect(() => {
-        if (field.value) {
-            setValue(field.value);
-        }
-    }, [field.value, setValue]);
 
     return <Input {...field} ref={iMaskRef as React.Ref<HTMLInputElement>} defaultValue={field.value} />;
 });
@@ -97,7 +91,7 @@ const SelectionFieldBlock = ({ label, value, placeholder, isOpen, onClick, disab
 
 const DropdownList = ({ items = [], onSelect, title, searchable, onClose, loading, error }: { items: FipeItem[], onSelect: (item:FipeItem)=>void, title:string, searchable?:boolean, onClose:()=>void, loading: boolean, error: string | null }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (searchable && inputRef.current) inputRef.current.focus();
@@ -163,8 +157,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
   // Estados de UI
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [showContactFields, setShowContactFields] = useState(false);
-
+  
   // Hooks de dados da FIPE
   const { data: brands, loading: brandsLoading, error: brandsError } = useFipeBrands(vehicleType);
   const { data: models, loading: modelsLoading, error: modelsError } = useFipeModels(vehicleType, selectedBrand?.codigo);
@@ -178,15 +171,18 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   // Efeitos para resetar campos dependentes
   useEffect(() => {
     setSelectedBrand(null);
-  }, [vehicleType]);
+    setValue("vehicleBrand", "");
+  }, [vehicleType, setValue]);
   
   useEffect(() => {
     setSelectedModel(null);
-  }, [selectedBrand]);
+    setValue("vehicleModel", "");
+  }, [selectedBrand, setValue]);
 
   useEffect(() => {
     setSelectedYear(null);
-  }, [selectedModel]);
+    setValue("vehicleYear", "");
+  }, [selectedModel, setValue]);
   
   // Seta os valores no react-hook-form quando a seleção muda
   useEffect(() => setValue("vehicleBrand", selectedBrand?.nome || ""), [selectedBrand, setValue]);
@@ -204,7 +200,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     trigger().then(isFormValid => {
       if (isFormValid) {
         const formData = new FormData(e.target as HTMLFormElement);
-        // Os campos do react-hook-form já estão no formulário
+        formData.set('preferredDate', format(getValues('preferredDate'), 'yyyy-MM-dd'));
         startTransition(() => formAction(formData));
       }
     });
@@ -234,7 +230,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
       {/* --- SELEÇÃO DE VEÍCULO --- */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800">Selecione o seu veículo</h2>
+            <h2 className="text-lg font-semibold text-gray-800">1. Selecione o seu veículo</h2>
             <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
                 <VehicleTypeIcon active={vehicleType === 'carros'} onClick={() => setVehicleType('carros')} icon={<Car size={18} />} />
                 <VehicleTypeIcon active={vehicleType === 'motos'} onClick={() => setVehicleType('motos')} icon={<Bike size={18} />} />
@@ -299,7 +295,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
             {activeDropdown === 'year' && (
               <DropdownList 
                 items={years} 
-                onSelect={(item) => { setSelectedYear(item); setActiveDropdown(null); setShowContactFields(true); }} 
+                onSelect={(item) => { setSelectedYear(item); setActiveDropdown(null); }} 
                 title="Selecione o Ano"
                 onClose={() => setActiveDropdown(null)}
                 loading={yearsLoading}
@@ -309,125 +305,127 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
         </div>
       </div>
       
-      {/* --- CONTATO E AGENDAMENTO (CONDICIONAL) --- */}
-      {(showContactFields || selectedYear) && (
-        <div className="space-y-6 pt-6 border-t border-dashed mt-6 animate-in fade-in-50">
-          <h3 className="text-xl font-semibold font-headline">2. Contato e Unidade</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="name">Seu nome</Label>
-              <Controller name="name" control={control} render={({ field }) => <Input id="name" {...field} />} />
-              {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
+      <Collapsible open={!!selectedYear}>
+        <CollapsibleContent>
+          <div className="space-y-6 pt-6 border-t border-dashed mt-6">
+            <h3 className="text-lg font-semibold text-gray-800">2. Contato e Unidade</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Seu nome</Label>
+                <Controller name="name" control={control} render={({ field }) => <Input id="name" {...field} />} />
+                {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
+              </div>
+              <div>
+                <Label htmlFor="phone">Seu WhatsApp</Label>
+                 <Controller name="phone" control={control} render={({ field }) => <PhoneInput field={field} />} />
+                {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
+              </div>
             </div>
             <div>
-              <Label htmlFor="phone">Seu WhatsApp</Label>
-               <Controller name="phone" control={control} render={({ field }) => <PhoneInput field={field} />} />
-              {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
+                <Label htmlFor="unit">Unidade de preferência</Label>
+                <Controller
+                  name="unit"
+                  control={control}
+                  render={({ field }) => (
+                      <div className="flex gap-2 flex-wrap pt-2">
+                          {units.map(unit => (
+                              <button
+                                  type="button"
+                                  key={unit.id}
+                                  onClick={() => field.onChange(unit.id)}
+                                  className={cn(
+                                      "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
+                                      field.value === unit.id 
+                                          ? "bg-primary text-primary-foreground border-transparent"
+                                          : "bg-transparent hover:bg-muted"
+                                  )}
+                              >
+                                  {unit.name.replace('Unidade ', '')}
+                              </button>
+                          ))}
+                      </div>
+                  )}
+                />
+                {errors.unit && <p className="text-sm text-red-600 mt-1">{errors.unit.message}</p>}
+              </div>
+              
+              <h3 className="text-lg font-semibold text-gray-800 pt-4">3. Data e Horário</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex flex-col items-center">
+                <Label className="mb-2 self-start">Data de preferência</Label>
+                <Controller
+                  name="preferredDate"
+                  control={control}
+                  render={({ field }) => (
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date < new Date(new Date().toDateString())}
+                      initialFocus
+                      locale={ptBR}
+                      className="border rounded-md"
+                    />
+                  )}
+                />
+                 {errors.preferredDate && <p className="text-sm text-red-600 mt-1 self-start">{errors.preferredDate.message}</p>}
+              </div>
+              <div className="space-y-4">
+                <Label>Horário de preferência</Label>
+                <Controller
+                  name="preferredTime"
+                  control={control}
+                  render={({ field }) => (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {TIME_SLOTS.map(time => (
+                              <button
+                                  type="button"
+                                  key={time}
+                                  onClick={() => field.onChange(time)}
+                                  className={cn(
+                                      "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
+                                       field.value === time 
+                                          ? "bg-primary text-primary-foreground border-transparent"
+                                          : "bg-transparent hover:bg-muted"
+                                  )}
+                              >
+                                  {time}
+                              </button>
+                          ))}
+                      </div>
+                  )}
+                />
+                {errors.preferredTime && <p className="text-sm text-red-600 mt-1">{errors.preferredTime.message}</p>}
+              </div>
             </div>
-          </div>
-          <div>
-              <Label htmlFor="unit">Unidade de preferência</Label>
+            <div className="flex items-start space-x-3 pt-4">
               <Controller
-                name="unit"
+                name="lgpdConsent"
                 control={control}
                 render={({ field }) => (
-                    <div className="flex gap-2 flex-wrap pt-2">
-                        {units.map(unit => (
-                            <button
-                                type="button"
-                                key={unit.id}
-                                onClick={() => field.onChange(unit.id)}
-                                className={cn(
-                                    "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
-                                    field.value === unit.id 
-                                        ? "bg-primary text-primary-foreground border-transparent"
-                                        : "bg-transparent hover:bg-muted"
-                                )}
-                            >
-                                {unit.name.replace('Unidade ', '')}
-                            </button>
-                        ))}
-                    </div>
+                  <Checkbox id="lgpdConsent" onCheckedChange={field.onChange} checked={field.value} name="lgpdConsent" className="mt-1" />
                 )}
               />
-              {errors.unit && <p className="text-sm text-red-600 mt-1">{errors.unit.message}</p>}
+              <div className="grid gap-1.5 leading-none">
+                <label htmlFor="lgpdConsent" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Concordo com os termos
+                </label>
+                <p className="text-sm text-muted-foreground">
+                  Ao agendar, você concorda em ser contatado via WhatsApp e aceita nossa política de privacidade.
+                </p>
+                {errors.lgpdConsent && <p className="text-sm text-red-600 mt-1">{errors.lgpdConsent.message}</p>}
+              </div>
             </div>
-            
-            <h3 className="text-xl font-semibold font-headline pt-4">3. Data e Horário</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex flex-col items-center">
-              <Label className="mb-2 self-start">Data de preferência</Label>
-              <Controller
-                name="preferredDate"
-                control={control}
-                render={({ field }) => (
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date < new Date(new Date().toDateString())}
-                    initialFocus
-                    locale={ptBR}
-                    className="border rounded-md"
-                  />
-                )}
-              />
-               {errors.preferredDate && <p className="text-sm text-red-600 mt-1 self-start">{errors.preferredDate.message}</p>}
-            </div>
-            <div className="space-y-4">
-              <Label>Horário de preferência</Label>
-              <Controller
-                name="preferredTime"
-                control={control}
-                render={({ field }) => (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {TIME_SLOTS.map(time => (
-                            <button
-                                type="button"
-                                key={time}
-                                onClick={() => field.onChange(time)}
-                                className={cn(
-                                    "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
-                                     field.value === time 
-                                        ? "bg-primary text-primary-foreground border-transparent"
-                                        : "bg-transparent hover:bg-muted"
-                                )}
-                            >
-                                {time}
-                            </button>
-                        ))}
-                    </div>
-                )}
-              />
-              {errors.preferredTime && <p className="text-sm text-red-600 mt-1">{errors.preferredTime.message}</p>}
-            </div>
-          </div>
-          <div className="flex items-start space-x-3 pt-4">
-            <Controller
-              name="lgpdConsent"
-              control={control}
-              render={({ field }) => (
-                <Checkbox id="lgpdConsent" onCheckedChange={field.onChange} checked={field.value} name="lgpdConsent" className="mt-1" />
-              )}
-            />
-            <div className="grid gap-1.5 leading-none">
-              <label htmlFor="lgpdConsent" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Concordo com os termos
-              </label>
-              <p className="text-sm text-muted-foreground">
-                Ao agendar, você concorda em ser contatado via WhatsApp e aceita nossa política de privacidade.
-              </p>
-              {errors.lgpdConsent && <p className="text-sm text-red-600 mt-1">{errors.lgpdConsent.message}</p>}
-            </div>
-          </div>
 
-          <div className="pt-4">
-            <Button type="submit" disabled={isPending} variant="accent" size="lg" className="w-full">
-                {isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}
-            </Button>
+            <div className="pt-4">
+              <Button type="submit" disabled={isPending} variant="accent" size="lg" className="w-full">
+                  {isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        </CollapsibleContent>
+      </Collapsible>
+
 
        {serverState?.message && !serverState.success && (
         <Alert variant="destructive" className="mt-4">
@@ -439,3 +437,5 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </form>
   );
 }
+
+    
