@@ -15,7 +15,7 @@ import { type Unit, TIME_SLOTS } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar as CalendarIcon, Car, Bike, Truck, Tag, Search, X, CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { Car, Bike, Truck, Tag, Search, X, CheckCircle, Loader2, AlertCircle, ChevronDown, Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
@@ -210,7 +210,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
             setModels(data.modelos || []);
         } catch (err) {
             setModels([]);
-            setFipeError("Erro ao carregar modelos.");
+            setError("Erro ao carregar modelos.");
         } finally {
             setFipeLoading(false);
         }
