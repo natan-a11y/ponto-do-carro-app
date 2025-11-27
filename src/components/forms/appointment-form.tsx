@@ -205,6 +205,8 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
       fieldsToValidate = ['vehicleBrand', 'vehicleModel', 'vehicleYear'];
     } else if (step === 2) {
       fieldsToValidate = ['name', 'phone', 'unit'];
+    } else if (step === 3) {
+      fieldsToValidate = ['preferredDate'];
     }
 
     const isValid = await trigger(fieldsToValidate);
@@ -402,7 +404,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
           </div>
       </div>
 
-       {/* Etapa 3: Data, Horário e Finalização */}
+       {/* Etapa 3: Data */}
        <div className={cn("space-y-6", step !== 3 && 'hidden', "animate-in fade-in-50 duration-300")}>
             <div className="flex items-center gap-3">
               <button type="button" onClick={() => setStep(2)} className="p-2 hover:bg-muted rounded-full">
@@ -414,10 +416,8 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               </div>
             </div>
             
-            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">3. Data e Horário</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">3. Data de preferência</h3>
             <div className="flex flex-col items-center">
-              <Label className="mb-2 self-start">Data de preferência</Label>
               <Controller
                 name="preferredDate"
                 control={control}
@@ -435,8 +435,32 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               />
                {errors.preferredDate && <p className="text-sm text-red-600 mt-1 self-start">{errors.preferredDate.message}</p>}
             </div>
+             <div className="pt-2">
+                <Button 
+                    type="button" 
+                    onClick={handleNextStep}
+                    size="lg" 
+                    className="w-full"
+                >
+                Avançar para Horário
+                </Button>
+            </div>
+        </div>
+
+        {/* Etapa 4: Horário e Finalização */}
+        <div className={cn("space-y-6", step !== 4 && 'hidden', "animate-in fade-in-50 duration-300")}>
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => setStep(3)} className="p-2 hover:bg-muted rounded-full">
+                <ArrowLeft size={16} />
+              </button>
+              <div>
+                <p className="text-sm font-semibold text-primary truncate max-w-[250px]">{selectedBrand?.nome} {selectedModel?.nome}</p>
+                <p className="text-xs text-muted-foreground">{selectedYear?.nome}</p>
+              </div>
+            </div>
+            
+            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">4. Horário de preferência</h3>
             <div className="space-y-4">
-              <Label>Horário de preferência</Label>
               <Controller
                 name="preferredTime"
                 control={control}
@@ -462,7 +486,6 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               />
               {errors.preferredTime && <p className="text-sm text-red-600 mt-1">{errors.preferredTime.message}</p>}
             </div>
-          </div>
           <div className="flex items-start space-x-3 pt-4">
             <Controller
               name="lgpdConsent"
