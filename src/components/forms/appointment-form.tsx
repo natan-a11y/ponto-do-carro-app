@@ -13,9 +13,7 @@ import { type Unit, TIME_SLOTS } from "@/lib/data";
 import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Car, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft, HelpCircle } from "lucide-react";
+import { Car, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -197,7 +195,6 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     } else if (step === 4) {
       fieldsToValidate = ['preferredDate'];
     }
-
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
@@ -398,13 +395,13 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
         <h3 className="text-lg font-semibold text-gray-800 border-t pt-4">3. Seu Nome e Unidade</h3>
         <div className="grid grid-cols-1 gap-4">
           <div>
-            <Label htmlFor="name">Seu nome</Label>
-            <Controller name="name" control={control} render={({ field }) => <Input id="name" {...field} />} />
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Seu nome</label>
+            <Controller name="name" control={control} render={({ field }) => <input id="name" {...field} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" />} />
             {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
           </div>
         </div>
         <div>
-            <Label htmlFor="unit">Unidade de preferência</Label>
+            <label htmlFor="unit" className="block text-sm font-medium text-gray-700 mb-1">Unidade de preferência</label>
             <Controller
               name="unit"
               control={control}
