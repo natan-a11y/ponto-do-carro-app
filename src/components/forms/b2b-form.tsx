@@ -4,6 +4,7 @@ import { useTransition, useActionState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { IMaskInput } from "react-imask";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { submitB2bLead } from "@/app/actions";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { CheckCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
@@ -30,7 +32,7 @@ export function B2BForm() {
     resolver: zodResolver(formSchema),
   });
 
-  const { register, formState: { errors } } = form;
+  const { register, formState: { errors }, control } = form;
 
   const onSubmit = (data: FormData) => {
     const formData = new FormData();
@@ -75,7 +77,15 @@ export function B2BForm() {
       </div>
       <div>
         <Label htmlFor="phone">WhatsApp</Label>
-        <Input id="phone" type="tel" {...register("phone")} />
+        <IMaskInput
+            mask="(00) 00000-0000"
+            id="phone"
+            {...register("phone")}
+            className={cn(
+              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            )}
+            placeholder="(DDD) XXXXX-XXXX"
+        />
         {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
       </div>
       <Button type="submit" disabled={isPending} className="w-full" variant="accent">
