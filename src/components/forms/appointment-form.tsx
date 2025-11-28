@@ -5,7 +5,6 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useFormState } from "react-dom";
-import { useIMask } from "react-imask";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -16,7 +15,7 @@ import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Car, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft } from "lucide-react";
+import { Car, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft, HelpCircle } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -31,8 +30,8 @@ const formSchema = z.object({
   vehicleBrand: z.string().min(1, "Marca é obrigatória"),
   vehicleModel: z.string().min(1, "Modelo é obrigatório"),
   vehicleYear: z.string().min(1, "Ano é obrigatório"),
+  reasonForSelling: z.string().min(1, "Motivo é obrigatório"),
   name: z.string().min(2, "Nome é obrigatório"),
-  phone: z.string().min(15, "Telefone inválido"),
   unit: z.string().min(1, "Unidade é obrigatória"),
   preferredDate: z.date({ required_error: "Data é obrigatória" }),
   preferredTime: z.string().min(1, "Horário é obrigatório"),
@@ -43,17 +42,18 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+const REASONS_FOR_SELLING = [
+    "Mudança de País ou Cidade",
+    "Insegurança de vender no mercado particular",
+    "Não tem paciência de vender no mercado particular",
+    "Já comprou outro carro",
+    "Carro está financiado ou com débitos",
+    "Precisa do dinheiro com certa urgência",
+    "Outros"
+];
+
+
 // --- Componentes Auxiliares ---
-
-const PhoneInput = React.forwardRef<HTMLInputElement, { field: any }>(({ field }, ref) => {
-    const { ref: iMaskRef } = useIMask({ 
-      mask: '(00) 00000-0000',
-      onAccept: (value: any) => field.onChange(value)
-    });
-
-    return <Input {...field} ref={iMaskRef as React.Ref<HTMLInputElement>} defaultValue={field.value} />;
-});
-PhoneInput.displayName = 'PhoneInput';
 
 const SelectionFieldBlock = ({ label, value, placeholder, isOpen, onClick, disabled, icon }: { label:string, value?:string, placeholder:string, isOpen:boolean, onClick:()=>void, disabled?:boolean, icon:React.ReactNode }) => (
   <div 
@@ -76,16 +76,20 @@ const SelectionFieldBlock = ({ label, value, placeholder, isOpen, onClick, disab
   </div>
 );
 
-const DropdownList = ({ items = [], onSelect, title, searchable, onClose, loading, error }: { items: FipeItem[], onSelect: (item:FipeItem)=>void, title:string, searchable?:boolean, onClose:()=>void, loading: boolean, error: string | null }) => {
+const DropdownList = ({ items = [], onSelect, title, searchable, onClose, loading, error }: { items: (FipeItem | string)[], onSelect: (item: FipeItem | string)=>void, title:string, searchable?:boolean, onClose:()=>void, loading: boolean, error: string | null }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (searchable && inputRef.current) inputRef.current.focus();
   }, [searchable]);
+  
+  const getItemName = (item: FipeItem | string) => typeof item === 'string' ? item : item?.nome || 'Item';
+  const getItemKey = (item: FipeItem | string) => typeof item === 'string' ? item : item?.codigo || Math.random();
+
 
   const filteredItems = (items || []).filter(item => 
-    (item?.nome || '').toLowerCase().includes(searchTerm.toLowerCase())
+    getItemName(item).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -116,8 +120,8 @@ const DropdownList = ({ items = [], onSelect, title, searchable, onClose, loadin
             <div className="text-center py-8 text-red-500 text-sm">{error}</div>
         ) : filteredItems.length > 0 ? (
           filteredItems.map((item) => (
-            <div key={item?.codigo || Math.random()} className="p-2.5 hover:bg-gray-50 rounded-lg cursor-pointer text-sm text-gray-600 flex justify-between items-center group" onClick={() => onSelect(item)}>
-              <span>{item?.nome || 'Item'}</span>
+            <div key={getItemKey(item)} className="p-2.5 hover:bg-gray-50 rounded-lg cursor-pointer text-sm text-gray-600 flex justify-between items-center group" onClick={() => onSelect(item)}>
+              <span>{getItemName(item)}</span>
               <span className="opacity-0 group-hover:opacity-100 text-xs text-gray-400">Selecionar</span>
             </div>
           ))
@@ -187,10 +191,13 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     if (step === 1) {
       fieldsToValidate = ['vehicleBrand', 'vehicleModel', 'vehicleYear'];
     } else if (step === 2) {
-      fieldsToValidate = ['name', 'phone', 'unit'];
+      fieldsToValidate = ['reasonForSelling'];
     } else if (step === 3) {
+      fieldsToValidate = ['name', 'unit'];
+    } else if (step === 4) {
       fieldsToValidate = ['preferredDate'];
     }
+
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
@@ -248,6 +255,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               <input type="hidden" name="vehicleBrand" value={getValues("vehicleBrand")} />
               <input type="hidden" name="vehicleModel" value={getValues("vehicleModel")} />
               <input type="hidden" name="vehicleYear" value={getValues("vehicleYear")} />
+              <input type="hidden" name="reasonForSelling" value={getValues("reasonForSelling")} />
 
             <SelectionFieldBlock 
                 label="Marca"
@@ -279,7 +287,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               {activeDropdown === 'brand' && (
                 <DropdownList 
                   items={brands} 
-                  onSelect={(item) => { setSelectedBrand(item); setActiveDropdown('model'); }} 
+                  onSelect={(item) => { setSelectedBrand(item as FipeItem); setActiveDropdown('model'); }} 
                   title="Selecione a Marca"
                   searchable
                   onClose={() => setActiveDropdown(null)}
@@ -290,7 +298,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               {activeDropdown === 'model' && (
                 <DropdownList 
                   items={models} 
-                  onSelect={(item) => { setSelectedModel(item); setActiveDropdown('year'); }} 
+                  onSelect={(item) => { setSelectedModel(item as FipeItem); setActiveDropdown('year'); }} 
                   title="Selecione o Modelo"
                   searchable
                   onClose={() => setActiveDropdown(null)}
@@ -301,7 +309,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               {activeDropdown === 'year' && (
                 <DropdownList 
                   items={years} 
-                  onSelect={(item) => { setSelectedYear(item); setActiveDropdown(null); }} 
+                  onSelect={(item) => { setSelectedYear(item as FipeItem); setActiveDropdown(null); }} 
                   title="Selecione o Ano"
                   onClose={() => setActiveDropdown(null)}
                   loading={yearsLoading}
@@ -323,10 +331,62 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
         </div>
       </div>
       
-      {/* Etapa 2: Contato e Unidade */}
-      <div className={cn("space-y-6", step !== 2 && 'hidden', "animate-in fade-in-50 duration-300")}>
+      {/* Etapa 2: Motivo da Venda */}
+       <div className={cn("space-y-6", step !== 2 && 'hidden', "animate-in fade-in-50 duration-300")}>
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => setStep(1)} className="p-2 hover:bg-muted rounded-full">
+                <ArrowLeft size={16} />
+              </button>
+              <div>
+                <p className="text-sm font-semibold text-primary truncate max-w-[250px]">{selectedBrand?.nome} {selectedModel?.nome}</p>
+                <p className="text-xs text-muted-foreground">{selectedYear?.nome}</p>
+              </div>
+            </div>
+            
+            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">2. Motivo da Venda</h3>
+            <div>
+              <Controller
+                name="reasonForSelling"
+                control={control}
+                render={({ field }) => (
+                    <div className="flex flex-col gap-3">
+                        {REASONS_FOR_SELLING.map(reason => (
+                            <button
+                                type="button"
+                                key={reason}
+                                onClick={() => field.onChange(reason)}
+                                className={cn(
+                                    "px-4 py-3 text-left rounded-lg text-sm font-medium border transition-colors",
+                                    field.value === reason 
+                                        ? "bg-primary text-primary-foreground border-transparent"
+                                        : "bg-transparent hover:bg-muted"
+                                )}
+                            >
+                                {reason}
+                            </button>
+                        ))}
+                    </div>
+                )}
+                />
+                {errors.reasonForSelling && <p className="text-sm text-red-600 mt-1">{errors.reasonForSelling.message}</p>}
+            </div>
+            <div className="pt-2">
+                <Button 
+                    type="button" 
+                    onClick={handleNextStep}
+                    size="lg" 
+                    className="w-full"
+                    disabled={!getValues("reasonForSelling")}
+                >
+                Avançar
+                </Button>
+            </div>
+        </div>
+
+      {/* Etapa 3: Contato e Unidade */}
+      <div className={cn("space-y-6", step !== 3 && 'hidden', "animate-in fade-in-50 duration-300")}>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setStep(1)} className="p-2 hover:bg-muted rounded-full">
+          <button type="button" onClick={() => setStep(2)} className="p-2 hover:bg-muted rounded-full">
             <ArrowLeft size={16} />
           </button>
           <div>
@@ -335,17 +395,12 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
           </div>
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-800 border-t pt-4">2. Contato e Unidade</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h3 className="text-lg font-semibold text-gray-800 border-t pt-4">3. Seu Nome e Unidade</h3>
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <Label htmlFor="name">Seu nome</Label>
             <Controller name="name" control={control} render={({ field }) => <Input id="name" {...field} />} />
             {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
-          </div>
-          <div>
-            <Label htmlFor="phone">Seu WhatsApp</Label>
-             <Controller name="phone" control={control} render={({ field }) => <PhoneInput field={field} />} />
-            {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>}
           </div>
         </div>
         <div>
@@ -387,10 +442,10 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
           </div>
       </div>
 
-       {/* Etapa 3: Data */}
-       <div className={cn("space-y-6", step !== 3 && 'hidden', "animate-in fade-in-50 duration-300")}>
+       {/* Etapa 4: Data */}
+       <div className={cn("space-y-6", step !== 4 && 'hidden', "animate-in fade-in-50 duration-300")}>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => setStep(2)} className="p-2 hover:bg-muted rounded-full">
+              <button type="button" onClick={() => setStep(3)} className="p-2 hover:bg-muted rounded-full">
                 <ArrowLeft size={16} />
               </button>
               <div>
@@ -399,7 +454,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               </div>
             </div>
             
-            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">3. Data de preferência</h3>
+            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">4. Data de preferência</h3>
             <div className="flex flex-col items-center">
               <Controller
                 name="preferredDate"
@@ -430,10 +485,10 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
             </div>
         </div>
 
-        {/* Etapa 4: Horário e Finalização */}
-        <div className={cn("space-y-6", step !== 4 && 'hidden', "animate-in fade-in-50 duration-300")}>
+        {/* Etapa 5: Horário e Finalização */}
+        <div className={cn("space-y-6", step !== 5 && 'hidden', "animate-in fade-in-50 duration-300")}>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => setStep(3)} className="p-2 hover:bg-muted rounded-full">
+              <button type="button" onClick={() => setStep(4)} className="p-2 hover:bg-muted rounded-full">
                 <ArrowLeft size={16} />
               </button>
               <div>
@@ -442,7 +497,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               </div>
             </div>
             
-            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">4. Horário de preferência</h3>
+            <h3 className="text-lg font-semibold text-gray-800 pt-4 border-t">5. Horário de preferência</h3>
             <div className="space-y-4">
               <Controller
                 name="preferredTime"
@@ -482,7 +537,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
                 Concordo com os termos
               </label>
               <p className="text-sm text-muted-foreground">
-                Ao agendar, você concorda em ser contatado via WhatsApp e aceita nossa política de privacidade.
+                Ao agendar, você concorda em ser contatado e aceita nossa política de privacidade.
               </p>
               {errors.lgpdConsent && <p className="text-sm text-red-600 mt-1">{errors.lgpdConsent.message}</p>}
             </div>
