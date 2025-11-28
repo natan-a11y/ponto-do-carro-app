@@ -1,12 +1,8 @@
+"use client";
+
 import { AppointmentForm } from "@/components/forms/appointment-form";
 import { UNITS } from "@/lib/data";
-import type { Metadata } from "next";
-import { Users, ArrowRight } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: "Agendar Avaliação Gratuita | Ponto do Carro",
-  description: "Venda seu carro em 24h. Use nossa ferramenta para selecionar seu veículo e agende uma avaliação gratuita em uma de nossas unidades. Rápido, justo e pagamento à vista.",
-};
+import { Users } from 'lucide-react';
 
 export default function AgendarAvaliacaoPage() {
   return (

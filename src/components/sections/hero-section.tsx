@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { useContactModal } from "../site/contact-modal";
 import { cn } from "@/lib/utils";
+import { HeroAppointmentForm } from "../forms/hero-appointment-form";
 
 export function HeroSection() {
   const { onOpen } = useContactModal();
@@ -16,7 +17,7 @@ export function HeroSection() {
 
   return (
     <div 
-      className="relative w-full h-screen flex items-center justify-end -mt-20"
+      className="relative w-full min-h-screen flex items-center justify-end -mt-20 pt-20 pb-10"
       style={{ 
         backgroundImage: `url(https://i.postimg.cc/pT3ZYr3k/2020-Honda-Civic-Type-R-001-2160.jpg)`,
         backgroundSize: 'cover',
@@ -26,7 +27,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-l from-black/80 via-black/60 to-transparent z-10" />
 
       <div className="container relative z-20 h-full flex flex-col justify-center items-end text-right max-w-7xl">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl w-full">
            <h1 className={cn(
             "text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl font-headline text-primary-foreground"
           )}>
@@ -55,6 +56,9 @@ export function HeroSection() {
                Agendar avaliação
             </Button>
           </div>
+        </div>
+         <div className="w-full max-w-4xl mt-12 animate-in fade-in slide-in-from-bottom-16 duration-1000 ease-in-out" style={{ animationDelay: '1100ms' }}>
+            <HeroAppointmentForm />
         </div>
       </div>
     </div>

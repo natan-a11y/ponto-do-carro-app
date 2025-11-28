@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useFormState } from "react-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useSearchParams } from "next/navigation";
+
 
 import { scheduleAppointment } from "@/app/actions";
 import { type Unit, TIME_SLOTS } from "@/lib/data";
@@ -131,12 +133,10 @@ const DropdownList = ({ items = [], onSelect, title, searchable, onClose, loadin
   );
 };
 
-
-// --- Componente Principal do Formulário ---
-
-export function AppointmentForm({ units }: { units: Unit[] }) {
+const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
   const [serverState, formAction] = useFormState(scheduleAppointment, { message: null });
   const [isPending, startTransition] = React.useTransition();
+  const searchParams = useSearchParams();
 
   // Estado da Etapa
   const [step, setStep] = useState(1);
@@ -149,7 +149,8 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
   // Estados de UI
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  
+  const [isInitialized, setIsInitialized] = useState(false);
+
   // Hooks de dados da FIPE
   const { data: brands, loading: brandsLoading, error: brandsError } = useFipeBrands(vehicleType);
   const { data: models, loading: modelsLoading, error: modelsError } = useFipeModels(vehicleType, selectedBrand?.codigo);
@@ -162,16 +163,58 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
 
   const reasonForSellingValue = watch("reasonForSelling");
 
+  // Efeito para inicializar com dados da URL
+  useEffect(() => {
+    if (brands.length > 0 && searchParams.has('brandCode') && !isInitialized) {
+        const brandCode = searchParams.get('brandCode');
+        const brandName = searchParams.get('brandName');
+        const modelCode = searchParams.get('modelCode');
+        const modelName = searchParams.get('modelName');
+        const yearCode = searchParams.get('yearCode');
+        const yearName = searchParams.get('yearName');
+
+        if (brandCode && brandName) {
+            const initialBrand = { codigo: brandCode, nome: brandName };
+            setSelectedBrand(initialBrand);
+            setValue("vehicleBrand", brandName);
+
+            if (modelCode && modelName) {
+                 setTimeout(() => {
+                    const initialModel = { codigo: modelCode, nome: modelName };
+                    setSelectedModel(initialModel);
+                    setValue("vehicleModel", modelName);
+
+                    if (yearCode && yearName) {
+                        setTimeout(() => {
+                            const initialYear = { codigo: yearCode, nome: yearName };
+                            setSelectedYear(initialYear);
+                            setValue("vehicleYear", yearName);
+                            trigger(['vehicleBrand', 'vehicleModel', 'vehicleYear']);
+                            setIsInitialized(true);
+                            setStep(2); // Avança para a próxima etapa
+                        }, 50);
+                    }
+                }, 50);
+            }
+        }
+    }
+  }, [brands, searchParams, setValue, trigger, isInitialized]);
+
+
   // Efeitos para resetar campos dependentes
   useEffect(() => {
-    setSelectedModel(null);
-    setValue("vehicleModel", "");
-  }, [selectedBrand, setValue]);
+    if (isInitialized) {
+        setSelectedModel(null);
+        setValue("vehicleModel", "");
+    }
+  }, [selectedBrand, setValue, isInitialized]);
 
   useEffect(() => {
-    setSelectedYear(null);
-    setValue("vehicleYear", "");
-  }, [selectedModel, setValue]);
+    if (isInitialized) {
+        setSelectedYear(null);
+        setValue("vehicleYear", "");
+    }
+  }, [selectedModel, setValue, isInitialized]);
   
   // Seta os valores no react-hook-form quando a seleção muda
   useEffect(() => setValue("vehicleBrand", selectedBrand?.nome || ""), [selectedBrand, setValue]);
@@ -285,7 +328,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               {activeDropdown === 'brand' && (
                 <DropdownList 
                   items={brands} 
-                  onSelect={(item) => { setSelectedBrand(item as FipeItem); setActiveDropdown('model'); }} 
+                  onSelect={(item) => { setSelectedBrand(item as FipeItem); setActiveDropdown('model'); setIsInitialized(true); }} 
                   title="Selecione a Marca"
                   searchable
                   onClose={() => setActiveDropdown(null)}
@@ -366,7 +409,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
                     </div>
                 )}
                 />
-                <input type="hidden" {...control.register("reasonForSelling")} />
+                <input type="hidden" {...control.register("reasonForSelling")} name="reasonForSelling" />
                 {errors.reasonForSelling && <p className="text-sm text-red-600 mt-1">{errors.reasonForSelling.message}</p>}
             </div>
             <div className="pt-2">
@@ -561,4 +604,10 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   );
 }
 
-    
+export function AppointmentForm({ units }: { units: Unit[] }) {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <AppointmentFormInner units={units} />
+    </Suspense>
+  )
+}
