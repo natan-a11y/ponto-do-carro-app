@@ -287,7 +287,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
           <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-800">1. Selecione o seu veículo</h2>
                <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                  <div className="p-2 rounded-md bg-white shadow-sm text-black">
+                  <div className="p-2 rounded-full bg-white shadow-sm text-black">
                      <Car size={18} />
                   </div>
               </div>
