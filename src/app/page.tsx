@@ -1,17 +1,9 @@
 import { HeroSection } from "@/components/sections/hero-section";
-import { HowItWorksSection } from "@/components/sections/how-it-works-section";
-import { SocialProofSection } from "@/components/sections/social-proof-section";
-import { UnitsSection } from "@/components/sections/units-section";
-import { FaqSection } from "@/components/sections/faq-section";
 
 export default function Home() {
   return (
     <div className="flex flex-col">
       <HeroSection />
-      <HowItWorksSection />
-      <SocialProofSection />
-      <UnitsSection />
-      <FaqSection maxItems={5}/>
     </div>
   );
 }
