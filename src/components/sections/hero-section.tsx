@@ -14,7 +14,7 @@ export function HeroSection() {
         backgroundPosition: 'center'
       }}
     >
-      <div className="absolute inset-0 bg-black/70 z-10" />
+      <div className="absolute inset-0 bg-black/60 z-10" />
 
       <main className="w-full max-w-7xl mx-auto px-6 py-16 md:py-24 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-20">
         
@@ -54,9 +54,8 @@ export function HeroSection() {
 
         {/* Lado Direito: Formulário */}
         <div className="flex justify-center lg:justify-end animate-in fade-in slide-in-from-right-4 duration-700 delay-150">
-           <div className="w-full max-w-md relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-              <div className="w-full bg-white rounded-2xl shadow-xl border border-gray-200 p-6 relative z-20">
+           <div className="w-full max-w-md relative">
+              <div className="w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 relative z-20">
                 <AppointmentForm units={UNITS} />
               </div>
            </div>
