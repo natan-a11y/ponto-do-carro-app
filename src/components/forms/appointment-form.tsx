@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -136,7 +136,7 @@ const DropdownList = ({ items = [], onSelect, title, searchable, onClose, loadin
 
 export function AppointmentForm({ units }: { units: Unit[] }) {
   const [serverState, formAction] = useFormState(scheduleAppointment, { message: null });
-  const [isPending, startTransition] = useTransition();
+  const [isPending, startTransition] = React.useTransition();
 
   // Estado da Etapa
   const [step, setStep] = useState(1);
@@ -155,10 +155,12 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
   const { data: models, loading: modelsLoading, error: modelsError } = useFipeModels(vehicleType, selectedBrand?.codigo);
   const { data: years, loading: yearsLoading, error: yearsError } = useFipeYears(vehicleType, selectedBrand?.codigo, selectedModel?.codigo);
   
-  const { control, trigger, getValues, setValue, formState: { errors } } = useForm<FormData>({
+  const { control, trigger, getValues, setValue, formState: { errors }, watch } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onTouched",
   });
+
+  const reasonForSellingValue = watch("reasonForSelling");
 
   // Efeitos para resetar campos dependentes
   useEffect(() => {
@@ -252,7 +254,6 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
               <input type="hidden" name="vehicleBrand" value={getValues("vehicleBrand")} />
               <input type="hidden" name="vehicleModel" value={getValues("vehicleModel")} />
               <input type="hidden" name="vehicleYear" value={getValues("vehicleYear")} />
-              <input type="hidden" name="reasonForSelling" value={getValues("reasonForSelling")} />
 
             <SelectionFieldBlock 
                 label="Marca"
@@ -365,6 +366,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
                     </div>
                 )}
                 />
+                <input type="hidden" {...control.register("reasonForSelling")} />
                 {errors.reasonForSelling && <p className="text-sm text-red-600 mt-1">{errors.reasonForSelling.message}</p>}
             </div>
             <div className="pt-2">
@@ -373,7 +375,7 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
                     onClick={handleNextStep}
                     size="lg" 
                     className="w-full"
-                    disabled={!getValues("reasonForSelling")}
+                    disabled={!reasonForSellingValue}
                 >
                 Avançar
                 </Button>
@@ -558,3 +560,5 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </form>
   );
 }
+
+    
