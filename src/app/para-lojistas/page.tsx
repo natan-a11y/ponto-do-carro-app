@@ -1,6 +1,6 @@
 import { B2B_BENEFITS } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { placeholderImages } from "@/lib/placeholder-images.json";
+import placeholderImages from "@/lib/placeholder-images.json";
 import Image from "next/image";
 import type { Metadata } from 'next';
 import { B2BForm } from "@/components/forms/b2b-form";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Seja nosso parceiro e tenha acesso a um deal flow qualificado de veículos. Aumente seu estoque sem esforço e com zero Capex.',
 };
 
-const b2bImage = placeholderImages.find(p => p.id === 'b2b-image');
+const b2bImage = placeholderImages.placeholderImages.find(p => p.id === 'b2b-image');
 
 export default function ParaLojistasPage() {
   return (

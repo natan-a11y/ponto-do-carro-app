@@ -1,6 +1,7 @@
 "use client";
 
-import { useTransition, useActionState } from "react";
+import { useTransition } from "react";
+import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,7 +27,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export function B2BForm() {
   const [isPending, startTransition] = useTransition();
-  const [state, formAction] = useActionState(submitB2bLead, { message: null });
+  const [state, formAction] = useFormState(submitB2bLead, { message: null });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),

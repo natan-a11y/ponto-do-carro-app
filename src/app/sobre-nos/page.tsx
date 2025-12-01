@@ -1,4 +1,4 @@
-import { placeholderImages } from "@/lib/placeholder-images.json";
+import placeholderImages from "@/lib/placeholder-images.json";
 import Image from "next/image";
 import type { Metadata } from 'next';
 import { BadgeCheck } from "lucide-react";
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Conheça a história e a missão da Ponto do Carro: revolucionar a venda de carros usados em Belo Horizonte com tecnologia, transparência e eficiência.',
 };
 
-const aboutImage = placeholderImages.find(p => p.id === 'about-us');
+const aboutImage = placeholderImages.placeholderImages.find(p => p.id === 'about-us');
 
 const values = [
     { title: 'Transparência', description: 'Todo o processo, da avaliação à proposta, é claro e sem letras miúdas.' },
