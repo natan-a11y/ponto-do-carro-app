@@ -1,9 +1,9 @@
 import type { Unit, FAQItem, Review, HowItWorksStep, NavItem, B2BBenefit } from './types';
 import { Calendar, Car, Handshake, Search, BadgeCheck, Users, Zap } from 'lucide-react';
-import { placeholderImages } from './placeholder-images.json';
+import placeholderImages from './placeholder-images.json';
 
 const getPlaceholderImage = (id: string) => {
-  const img = placeholderImages.find(p => p.id === id);
+  const img = placeholderImages.placeholderImages.find(p => p.id === id);
   if (!img) {
     return { url: 'https://placehold.co/600x400', hint: 'placeholder' };
   }
