@@ -552,7 +552,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
                                 key={time}
                                 onClick={() => field.onChange(time)}
                                 className={cn(
-                                    "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
+                                    "px-3 py-2 rounded-full text-sm font-medium border transition-colors",
                                      field.value === time 
                                         ? "bg-primary text-primary-foreground border-transparent"
                                         : "bg-white border-gray-200 hover:bg-gray-50"
