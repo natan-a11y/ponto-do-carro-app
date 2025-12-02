@@ -15,7 +15,7 @@ import { type Unit, TIME_SLOTS } from "@/lib/data";
 import { useFipeBrands, useFipeModels, useFipeYears } from "@/hooks/use-fipe";
 
 import { Button } from "@/components/ui/button";
-import { Car, Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft } from "lucide-react";
+import { Tag, Search, X, CheckCircle, Loader2, AlertCircle, Calendar as CalendarIcon, ChevronDown, ArrowLeft } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -162,6 +162,11 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
   });
 
   const reasonForSellingValue = watch("reasonForSelling");
+  const nameValue = watch("name");
+  const unitValue = watch("unit");
+  const preferredDateValue = watch("preferredDate");
+  const preferredTimeValue = watch("preferredTime");
+
 
   // Efeito para inicializar com dados da URL
   useEffect(() => {
@@ -284,9 +289,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
       {/* Etapa 1: Seleção de Veículo */}
       <div className={cn(step !== 1 && 'hidden', "animate-in fade-in-50 duration-300")}>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-800">1. Selecione o seu veículo</h2>
-          </div>
+           <h2 className="text-lg font-semibold text-gray-800">1. Selecione o seu veículo</h2>
           
           <div className="flex flex-col gap-4 relative">
               <input type="hidden" name="vehicleBrand" value={getValues("vehicleBrand")} />
@@ -308,7 +311,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
                 isOpen={activeDropdown === 'model'}
                 onClick={() => toggleDropdown('model')}
                 disabled={!selectedBrand || models.length === 0}
-                icon={<Car size={18} />}
+                icon={<Tag size={18} />}
               />
               <SelectionFieldBlock 
                 label="Ano"
@@ -392,10 +395,10 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
                                 key={reason}
                                 onClick={() => field.onChange(reason)}
                                 className={cn(
-                                    "px-4 py-3 text-left rounded-lg text-sm font-medium border transition-colors",
+                                    "px-4 py-3 text-left rounded-xl text-sm font-medium border transition-colors",
                                     field.value === reason 
                                         ? "bg-primary text-primary-foreground border-transparent"
-                                        : "bg-transparent hover:bg-muted"
+                                        : "bg-white border-gray-200 hover:bg-gray-50"
                                 )}
                             >
                                 {reason}
@@ -435,18 +438,18 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
         <h3 className="text-lg font-semibold text-gray-800 border-t pt-4">3. Seu Nome e Unidade</h3>
         <div className="grid grid-cols-1 gap-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Seu nome</label>
-            <Controller name="name" control={control} render={({ field }) => <input id="name" {...field} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" />} />
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1 sr-only">Seu nome</label>
+            <Controller name="name" control={control} render={({ field }) => <input id="name" {...field} placeholder="Seu nome" className="w-full px-4 h-14 rounded-xl border border-gray-200 bg-white focus:ring-primary focus:border-primary" />} />
             {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
           </div>
         </div>
         <div>
-            <label htmlFor="unit" className="block text-sm font-medium text-gray-700 mb-1">Unidade de preferência</label>
+            <label htmlFor="unit" className="block text-sm font-medium text-gray-700 mb-2">Unidade de preferência</label>
             <Controller
               name="unit"
               control={control}
               render={({ field }) => (
-                  <div className="flex gap-2 flex-wrap pt-2">
+                  <div className="flex gap-2 flex-wrap pt-1">
                       {units.map(unit => (
                           <button
                               type="button"
@@ -456,7 +459,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
                                   "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
                                   field.value === unit.id 
                                       ? "bg-primary text-primary-foreground border-transparent"
-                                      : "bg-transparent hover:bg-muted"
+                                      : "bg-white border-gray-200 hover:bg-gray-50"
                               )}
                           >
                               {unit.name.replace('Unidade ', '')}
@@ -473,6 +476,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
                 onClick={handleNextStep}
                 size="lg" 
                 className="w-full"
+                disabled={!nameValue || !unitValue}
               >
               Avançar para Agendamento
             </Button>
@@ -504,7 +508,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
                     disabled={(date) => date < new Date(new Date().toDateString())}
                     initialFocus
                     locale={ptBR}
-                    className="border rounded-md"
+                    className="border rounded-xl bg-white"
                   />
                 )}
               />
@@ -516,6 +520,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
                     onClick={handleNextStep}
                     size="lg" 
                     className="w-full"
+                    disabled={!preferredDateValue}
                 >
                 Avançar para Horário
                 </Button>
@@ -550,7 +555,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
                                     "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
                                      field.value === time 
                                         ? "bg-primary text-primary-foreground border-transparent"
-                                        : "bg-transparent hover:bg-muted"
+                                        : "bg-white border-gray-200 hover:bg-gray-50"
                                 )}
                             >
                                 {time}
@@ -570,10 +575,10 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
               )}
             />
             <div className="grid gap-1.5 leading-none">
-              <label htmlFor="lgpdConsent" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <label htmlFor="lgpdConsent" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white">
                 Concordo com os termos
               </label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-white/70">
                 Ao agendar, você concorda em ser contatado e aceita nossa política de privacidade.
               </p>
               {errors.lgpdConsent && <p className="text-sm text-red-600 mt-1">{errors.lgpdConsent.message}</p>}
@@ -581,7 +586,7 @@ const AppointmentFormInner = ({ units }: { units: Unit[] }) => {
           </div>
 
           <div className="pt-4">
-            <Button type="submit" disabled={isPending} variant="accent" size="lg" className="w-full">
+            <Button type="submit" disabled={isPending || !preferredTimeValue} variant="accent" size="lg" className="w-full">
                 {isPending ? <Loader2 className="animate-spin" /> : "Finalizar Agendamento"}
             </Button>
           </div>
@@ -606,3 +611,5 @@ export function AppointmentForm({ units }: { units: Unit[] }) {
     </Suspense>
   )
 }
+
+    
